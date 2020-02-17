@@ -1,10 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
+import {useSelector} from 'react-redux'
 
 const UserLogo = () => {
+const user = useSelector(state => state.user.name)
+
   return (
     <StyledLogo>
-      UserName
+      {user}
     </StyledLogo>
   )
 }
@@ -12,5 +15,6 @@ const UserLogo = () => {
 export default UserLogo
 
 const StyledLogo = styled.div`
-color: yellow;
+color: yellowgreen;
+font-size: 50px;
 `

@@ -26,17 +26,23 @@ router.route("/createuser").post((req, res) => {
 
 router.route("/login").post((req, res) => {
   User.find({ name: req.body.name, password: req.body.password })
-    .then((response) => res.json(response))
+    .then((resp) => {
+      if(resp.length === 0) {
+        return res.json('write correct login and password')
+      }else {
+       return res.json(resp[0])
+      }
+    } )
     .catch(err => res.status(400).json("ErrorLOGIN: " + err))
 });
 
-// router.route("/update").post((req, res) => {
-//   const name = req.body.name;
-//   const password = req.body.password;
+router.route("/update").post((req, res) => {
+  const name = req.body.name;
+  const type = req.body.type;
 
-//   User.find({ name, password })
-//     .then((response) => res.json(response))
-//     .catch(err => res.status(400).json("ErrorLOGIN: " + err))
-// });
+  User.update({ name, type })
+    .then((response) => res.json(response))
+    .catch(err => res.status(400).json("ErrorLOGIN: " + err))
+});
 
 module.exports = router

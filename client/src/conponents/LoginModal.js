@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
 import styled from 'styled-components'
 import axios from 'axios'
+import {useDispatch, useSelector} from 'react-redux'
 
-const RegisterModal = () => {
+const LoginModal = () => {
+
+  const dispatch = useDispatch()
 
   const [name, setName] = useState('')
   const [password, setPass] = useState('')
+  const [errors, setErrors] = useState('')
+
+  const resetFields = () => {
+    setName('')
+    setPass('')
+    setErrors('')
+  }
 
   const onSubmit = () => {
     if(name.length > 2 && password.length) {
       axios.post("/users/login", {name, password})
-        .then(res => console.log(res.data));
+        .then(res => {
+          if(typeof res.data === 'string') {
+            setErrors(res.data)
+          }else{
+            resetFields()
+            dispatch({type: 'SET_USER', payload: res.data.name})
+          }
+        });
     }
-  }
+  } 
+  
 
   return (
     <StyledModal>
@@ -28,11 +46,12 @@ const RegisterModal = () => {
   )
 }
 
-export default RegisterModal
+export default LoginModal
 
 const StyledModal = styled.div`
 text-align: right;
 color: yellow;
+padding: 10px 20px;
 input {
   height: 20px;
   display: inline-block;

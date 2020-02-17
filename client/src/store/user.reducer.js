@@ -1,4 +1,4 @@
-let initialState = {name: {}}
+let initialState = {name: ''}
 
 
 let user = function (state = initialState, action) {
@@ -6,7 +6,7 @@ let user = function (state = initialState, action) {
     case "SET_USER":
       return {...state, name: action.payload};
     case "LOGOUT_USER":
-      return {...state, name: {}};
+      return {...state, name: ''};
     default:
       return state;
   }

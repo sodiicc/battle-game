@@ -12,17 +12,22 @@ const RegisterModal = () => {
   const [Confirmpassword, setConfirm] = useState('')
   const [errors, setErrors] = useState('')
 
+  const resetFields = () => {
+    setName('')
+    setPass('')
+    setErrors('')
+    setConfirm('')
+  }
 
   const onSubmit = () => {
     if(name.length > 2 && password.length > 5 && password === Confirmpassword) {
       axios.post("/users/createuser", {name, password})
         .then(res => {
-          console.log('res',res,  typeof res.data)
 
           if(typeof res.data === 'string') {
             setErrors(res.data)
           }else{
-            console.log('res.data', res.data)
+            resetFields()
             dispatch({type: 'SET_USER', payload: res.data.name})
           }
           
