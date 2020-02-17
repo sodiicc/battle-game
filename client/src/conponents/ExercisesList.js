@@ -1,46 +1,47 @@
 import React, {useState, useEffect} from 'react';
-import {Link} from 'react-router-dom'
 import axios from 'axios'
+import {useSelector} from 'react-redux'
 
-const Exercise = props => {
-  const exercise = props.exercise
-  return (
-    <tr>
-      <td>{exercise.username}</td>
-      <td>{exercise.description}</td>
-      <td>{exercise.duration}</td>
-      <td>{exercise.date.substring(0,10)}</td>
-      <td>
-        <Link to={'/edit/'+exercise._id}>edit</Link> |{' '}
-        <Link to='/' onClick={() => {props.deleteExercise(exercise._id)}}>delete</Link>        
-      </td>
-    </tr>
-  )
-}
+
 
 export const ExercisesList = () => {
   const [exercises, setExercises] = useState([])
 
+  let user = useSelector(state => state.user)
+  console.log('user', user)
+
   useEffect(() => {
-    axios.get('/exercises')
+    axios.get('/heroes')
     .then(res => setExercises(res.data))
     .catch(err => console.log(err))
   }, [])
 
-  const deleteExercise = (id) => {
-    axios.delete('/exercises/'+ id)
-    setExercises(exercises.filter(el => el._id !== id))
-  }
+  // const deleteExercise = (id) => {
+  //   axios.delete('/heroes/'+ id)
+  //   setExercises(exercises.filter(el => el._id !== id))
+  // }
 
-  const exerciseList = () => {
-    return exercises.map(currentExercise => {
-      return <Exercise key={currentExercise._id} exercise={currentExercise} deleteExercise={deleteExercise} />
-    })
-  }
+  // const exerciseList = () => {
+  //   return exercises.map(currentExercise => {
+  //     return <Exercise key={currentExercise._id} exercise={currentExercise} deleteExercise={deleteExercise} />
+  //   })
+  // }
+  
 
+ let el =[]
+ for(let i=0; i < exercises.length; i++){
+   for (let prop in exercises[i]) {
+     el.push(<p key={prop+exercises[i].name}> {prop + " = " + exercises[i][prop]}</p>)
+   }
+ }
+  console.log('exercises',exercises )
   return (
     <div>
-      <h3>Logged Exercises</h3>
+      <div>
+      {el}
+        
+      </div>
+      {/* <h3>Logged Exercises</h3>
       <table className='table'>
         <thead className='thead-light'>
           <tr>
@@ -52,7 +53,7 @@ export const ExercisesList = () => {
           </tr>
         </thead>
         <tbody>{exerciseList()}</tbody>
-      </table>
+      </table> */}
     </div>
   )
 }

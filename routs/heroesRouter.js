@@ -1,9 +1,9 @@
 const router = require("express").Router();
-let Exercise = require("../models/exercises");
+let Hero = require("../models/hero");
 
 router.route("/").get((req, res) => {
-  Exercise.find()
-    .then(exercises => res.json(exercises))
+  Hero.find()
+    .then(heroes => res.json(heroes))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
@@ -13,39 +13,39 @@ router.route("/add").post((req, res) => {
   const duration = req.body.duration;
   const date = Date.parse(req.body.date);
 
-  const newExercise = new Exercise({ username, description, duration, date });
+  const newHero = new Hero({ username, description, duration, date });
 
-  newExercise
+  newHero
     .save()
     .then(() =>
       res
-        .json("Exercise added!")
+        .json("Hero added!")
         .catch(err => res.status(400).json("Error: " + err))
     );
 });
 
 router.route("/:id").get((req, res) => {
-  Exercise.findById(req.params.id)
-    .then(exercise => res.json(exercise))
+  Hero.findById(req.params.id)
+    .then(hero => res.json(hero))
     .catch(err => res.status(400).json("Errors: " + err));
 });
 
 router.route("/:id").delete((req, res) => {
-  Exercise.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Exercise deleted !!!"))
+  Hero.findByIdAndDelete(req.params.id)
+    .then(() => res.json("Hero deleted !!!"))
     .catch(err => res.status(400).json("Errors: " + err));
 });
 
 router.route("/update/:id").post((req, res) => {
-  Exercise.findById(req.params.id)
-    .then(exercise => {
-      exercise.username = req.body.username;
-      exercise.description = req.body.description;
-      exercise.duration = Number(req.body.duration);
-      exercise.date = Date.parse(req.body.date);
-      exercise
+  Hero.findById(req.params.id)
+    .then(hero => {
+      hero.username = req.body.username;
+      hero.description = req.body.description;
+      hero.duration = Number(req.body.duration);
+      hero.date = Date.parse(req.body.date);
+      hero
         .save()
-        .then(() => res.json("Exercise updated!"))
+        .then(() => res.json("Hero updated!"))
         .catch(err => res.status(400).json("Error: " + err));
     })
     .catch(err => res.status(400).json("Error: " + err));

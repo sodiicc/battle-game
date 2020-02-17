@@ -7,7 +7,7 @@ Inside progect:
 $ npm run start
 ```
 ```
-$ cd backend<br>
+$ cd client<br>
 ```
 ```
 $ npm run start

@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 
-export const CreateExercise = () => {
+export const CreateExercise = (props) => {
   const [exercise, setExercise] = useState({
     username: "",
     description: "",
@@ -14,7 +14,7 @@ export const CreateExercise = () => {
   
   
   useEffect(() => {
-    axios.get("/users").then(res => {
+    axios.get("/items").then(res => {
       if (res.data.length > 0) {
         setUsers(
           res.data.map(user => {
@@ -63,10 +63,9 @@ export const CreateExercise = () => {
     console.log("exercise", exercise);
 
     axios
-      .post("/exercises/add", exercise)
+      .post("/heroes/add", exercise)
       .then(res => console.log(res.data));
-
-    window.location = "/";
+    props.history.push('/')
   };
 
   return (

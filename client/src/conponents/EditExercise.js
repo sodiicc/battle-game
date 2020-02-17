@@ -14,7 +14,7 @@ export const EditExercise = (props) => {
 
   useEffect(() => {
     axios
-      .get("/exercises/" + props.match.params.id)
+      .get("/heroes/" + props.match.params.id)
       .then(res => {
         const data = res.data
         setExercise({
@@ -26,7 +26,7 @@ export const EditExercise = (props) => {
       })
       .catch(err => console.log(err))
 
-      axios.get("/users").then(res => {
+      axios.get("/items").then(res => {
       if (res.data.length > 0) {
         setUsers(
           res.data.map(user => {
@@ -75,10 +75,10 @@ export const EditExercise = (props) => {
     e.preventDefault();
 
     axios
-      .post("/exercises/update/"+ props.match.params.id, exercise)
+      .post("/heroes/update/"+ props.match.params.id, exercise)
       .then(res => console.log(res.data));
 
-    window.location = "/";
+      props.history.push('/')
   };
 
   return (

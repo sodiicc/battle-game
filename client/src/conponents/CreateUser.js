@@ -11,7 +11,7 @@ export const CreateUser = () => {
   const onSubmit = e => {
     e.preventDefault();
     
-    axios.post('/users/add', {username})
+    axios.post('/items/add', {username})
     .then(res => console.log(res.data))
 
     setUsername('')
