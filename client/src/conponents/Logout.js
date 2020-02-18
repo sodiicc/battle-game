@@ -2,19 +2,17 @@ import React, { useState } from 'react';
 import styled from 'styled-components'
 import axios from 'axios'
 import {useDispatch, useSelector} from 'react-redux'
+import { useHistory } from "react-router-dom"
 
-const Logout = () => {
-
+const Logout = props => {
+  let history = useHistory()
+console.log('ihistory', history)
   const dispatch = useDispatch()
-
-  const [name, setName] = useState('')
-  const [password, setPass] = useState('')
-  const [errors, setErrors] = useState('')
 
   const onSubmit = () => {
     dispatch({type: 'LOGOUT_USER'})
-    }  
-  
+    history.push("/")
+    }    
 
   return (
     <StyledModal>

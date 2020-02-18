@@ -1,8 +1,8 @@
 const router = require("express").Router();
 let User = require("../models/user");
 
-router.route("/").get((req, res) => {
-  User.find()
+router.route("/:name").get((req, res) => {
+  User.findOne({name: req.params.name})
     .then(users => res.json(users))
     .catch(err => res.status(400).json("Error: " + err));
 });
@@ -38,11 +38,12 @@ router.route("/login").post((req, res) => {
 
 router.route("/update").post((req, res) => {
   const name = req.body.name;
-  const type = req.body.type;
+  let data = req.body
+  delete data._id 
 
-  User.update({ name, type })
-    .then((response) => res.json(response))
-    .catch(err => res.status(400).json("ErrorLOGIN: " + err))
+  User.updateOne({name}, data)
+    .then(response =>  res.json(response))
+    .catch(err => res.status(400).json("ErrorUPDATE: " + err))
 });
 
 module.exports = router

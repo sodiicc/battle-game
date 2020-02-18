@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Navbar } from "./conponents/Navbar";
-import Game from "./conponents/Game";
+import GameRegistration from "./conponents/GameRegistration";
 import { Provider } from 'react-redux';
 import store from './store';
+import GameField from "./conponents/GameField";
 
 // export const port = process.env.PORT_FRONT || 3000;
 
@@ -14,7 +15,8 @@ function App() {
       <div className="container">
         <Navbar />
         <br />
-        <Route path="/" exact component={Game} />
+        <Route path="/" exact component={GameRegistration} />
+        <Route path="/game" exact component={GameField} />
       </div>
     </Router>
     </Provider>

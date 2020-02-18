@@ -8,14 +8,14 @@ import { useSelector } from 'react-redux'
 import Logout from './Logout';
 
 export const Navbar = () => {
-  const user = useSelector(state => state.user.name)
+  const user = useSelector(state => state.user)
 
   return (
     <StyledNav className='navbar navbar-dark bg-dark'>
       <Link to='/' className='navbar-brand' >Battle Game</Link>
       <UserLogo />
       {
-        !user.length ?
+        !user.name.length ?
           <div className='login-wrapper'>
             <RegisterModal />
             <LoginModal />
@@ -37,6 +37,9 @@ padding: 0.5rem 3rem;
 
 .login-wrapper {
   display: flex;
-
+}
+.error-field {
+  color: #f66;
+  font-size: 0.85rem;
 }
 `

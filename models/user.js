@@ -4,8 +4,14 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   name: {type: String, required:  true}, 
-  password: {type: String, required:  true},
-  type: {type: String, required:  false}
+  password: {type: String, required:  false},
+  class: {type: String, required:  false},
+  exp: {type: Number, required:  false},
+  hp: {type: Number, required:  false},
+  str: {type: Number, required:  false},
+  dex: {type: Number, required:  false},
+  vit: {type: Number, required:  false},
+  agil: {type: Number, required:  false},
 }, {
   timestamps: true,
 })

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components'
 import axios from 'axios'
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 
-const LoginModal = () => {
+const LoginModal = props => {
 
   const dispatch = useDispatch()
 
@@ -25,7 +25,8 @@ const LoginModal = () => {
             setErrors(res.data)
           }else{
             resetFields()
-            dispatch({type: 'SET_USER', payload: res.data.name})
+            console.log('res.data', res.data)
+            dispatch({type: 'SET_USER', payload: res.data})
           }
         });
     }
@@ -41,6 +42,7 @@ const LoginModal = () => {
       <div>
         <span>password</span><input type='password' onChange={e => setPass(e.target.value)} value={password} />
       </div>
+      <p className='error-field'>{errors}</p>
       <button onClick={() => onSubmit()}>Log In</button>
     </StyledModal>
   )

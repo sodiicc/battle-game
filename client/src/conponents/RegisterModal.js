@@ -11,7 +11,7 @@ const RegisterModal = () => {
   const [password, setPass] = useState('')
   const [Confirmpassword, setConfirm] = useState('')
   const [errors, setErrors] = useState('')
-
+  
   const resetFields = () => {
     setName('')
     setPass('')
@@ -20,7 +20,7 @@ const RegisterModal = () => {
   }
 
   const onSubmit = () => {
-    if(name.length > 2 && password.length > 5 && password === Confirmpassword) {
+    if(name.length > 2 && name.length < 15 && password.length > 5 && password === Confirmpassword) {
       axios.post("/users/createuser", {name, password})
         .then(res => {
 
@@ -28,7 +28,7 @@ const RegisterModal = () => {
             setErrors(res.data)
           }else{
             resetFields()
-            dispatch({type: 'SET_USER', payload: res.data.name})
+            dispatch({type: 'SET_USER_NAME', payload: res.data.name})
           }
           
           
@@ -40,14 +40,15 @@ const RegisterModal = () => {
     <StyledModal>
       <p>registration</p>
       <div>
-        <span>name</span><input onChange={e => setName(e.target.value)} value={name} />
+        <span>name</span><input placeholder='enter nickname 3-15 chars' onChange={e => setName(e.target.value)} value={name} />
       </div>
       <div>
-        <span>password</span><input type='password' onChange={e => setPass(e.target.value)} value={password} />
+        <span>password</span><input placeholder='enter pass more then 6 chars' type='password' onChange={e => setPass(e.target.value)} value={password} />
       </div>
       <div>
-        <span> confirm password</span><input type='password' onChange={e => setConfirm(e.target.value)} value={Confirmpassword} />
+        <span> confirm password</span><input  placeholder='confirm password' type='password' onChange={e => setConfirm(e.target.value)} value={Confirmpassword} />
       </div>
+  <p className='error-field'>{errors}</p>
       <button onClick={() => onSubmit()}>confirm</button>
     </StyledModal>
   )
@@ -62,6 +63,11 @@ input {
   height: 20px;
   display: inline-block;
   margin-left: 10px;
+  ::placeholder {
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-style: italic;
+  }
 }
 p {
   margin: 0;
