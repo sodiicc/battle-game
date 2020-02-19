@@ -1,47 +1,47 @@
 const router = require("express").Router();
-let Hero = require("../models/hero");
+let Enemy = require("../models/enemy");
 
 router.route("/").get((req, res) => {
-  Hero.find()
-    .then(heroes => res.json(heroes))
+  Enemy.find()
+    .then(enemies => res.json(enemies))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
 router.route("/add").post((req, res) => {
 
-  const newHero = new Hero(req.body);
+  const newEnemy = new Enemy(req.body);
 
-  newHero
+  newEnemy
     .save()
     .then(() =>
       res
-        .json("Hero added!")
+        .json("Enemy added!")
         )
         .catch(err => res.status(400).json("Error: " + err))
 });
 
 router.route("/:id").get((req, res) => {
-  Hero.findById(req.params.id)
-    .then(hero => res.json(hero))
+  Enemy.findById(req.params.id)
+    .then(enemy => res.json(enemy))
     .catch(err => res.status(400).json("Errors: " + err));
 });
 
 router.route("/:id").delete((req, res) => {
-  Hero.findByIdAndDelete(req.params.id)
-    .then(() => res.json("Hero deleted !!!"))
+  Enemy.findByIdAndDelete(req.params.id)
+    .then(() => res.json("Enemy deleted !!!"))
     .catch(err => res.status(400).json("Errors: " + err));
 });
 
 router.route("/update/:id").post((req, res) => {
-  Hero.findById(req.params.id)
-    .then(hero => {
-      hero.username = req.body.username;
-      hero.description = req.body.description;
-      hero.duration = Number(req.body.duration);
-      hero.date = Date.parse(req.body.date);
-      hero
+  Enemy.findById(req.params.id)
+    .then(enemy => {
+      enemy.username = req.body.username;
+      enemy.description = req.body.description;
+      enemy.duration = Number(req.body.duration);
+      enemy.date = Date.parse(req.body.date);
+      enemy
         .save()
-        .then(() => res.json("Hero updated!"))
+        .then(() => res.json("Enemy updated!"))
         .catch(err => res.status(400).json("Error: " + err));
     })
     .catch(err => res.status(400).json("Error: " + err));

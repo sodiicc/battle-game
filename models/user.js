@@ -8,6 +8,7 @@ const userSchema = new Schema({
   class: {type: String, required:  false},
   exp: {type: Number, required:  false},
   hp: {type: Number, required:  false},
+  lvl: {type: Number, required:  false},
   str: {type: Number, required:  false},
   dex: {type: Number, required:  false},
   vit: {type: Number, required:  false},

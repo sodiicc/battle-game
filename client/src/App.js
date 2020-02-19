@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import { Navbar } from "./conponents/Navbar";
-import GameRegistration from "./conponents/GameRegistration";
+import { Navbar } from "./components/Navbar";
+import GameRegistration from "./components/GameRegistration";
 import { Provider } from 'react-redux';
 import store from './store';
-import GameField from "./conponents/GameField";
+import GameField from "./components/GameField";
 
 // export const port = process.env.PORT_FRONT || 3000;
 

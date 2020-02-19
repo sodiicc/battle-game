@@ -22,10 +22,12 @@ connection.once('open', () => {
 const heroesRouter = require('./routs/heroesRouter');
 const itemsRouter = require('./routs/itemsRouter');
 const usersRouter = require('./routs/usersRouter');
+const enemiesRouter = require('./routs/enemiesRouter');
 
 app.use('/heroes', heroesRouter);
 app.use('/items', itemsRouter);
 app.use('/users', usersRouter);
+app.use('/enemies', enemiesRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "build", "index.html"));
