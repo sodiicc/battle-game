@@ -3,7 +3,6 @@ import { img_dificulties } from "../assets";
 import styled from "styled-components";
 
 const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
-  console.log("img_dificulties", img_dificulties);
   return (
     <StyledDiv>
       <div>
@@ -11,7 +10,7 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
         <div className="diff-wrapper">
           <div className="diff">
             <p>easy</p>
-            <img className="dificulty-logo" src={img_dificulties.easy}></img>
+            <img className="dificulty-logo" src={img_dificulties.easy} alt='img'></img>
             <div>
               <input
                 type="radio"
@@ -25,8 +24,8 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
             </div>
           </div>
           <div className="diff">
-            <p>easy</p>
-            <img className="dificulty-logo" src={img_dificulties.normal}></img>
+            <p>normal</p>
+            <img className="dificulty-logo" src={img_dificulties.normal} alt='img'></img>
             <div>
               <input
                 type="radio"
@@ -40,8 +39,8 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
             </div>
           </div>
           <div className="diff">
-            <p>easy</p>
-            <img className="dificulty-logo" src={img_dificulties.hard}></img>
+            <p>hard</p>
+            <img className="dificulty-logo" src={img_dificulties.hard} alt='img'></img>
             <div>
               <input
                 type="radio"

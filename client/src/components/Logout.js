@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components'
-import axios from 'axios'
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import { useHistory } from "react-router-dom"
 
 const Logout = props => {
   let history = useHistory()
-console.log('ihistory', history)
   const dispatch = useDispatch()
 
   const onSubmit = () => {

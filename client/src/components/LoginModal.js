@@ -25,7 +25,6 @@ const LoginModal = props => {
             setErrors(res.data)
           }else{
             resetFields()
-            console.log('res.data', res.data)
             dispatch({type: 'SET_USER', payload: res.data})
           }
         });

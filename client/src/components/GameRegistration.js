@@ -14,16 +14,15 @@ const GameRegistration = props => {
       .get("/heroes")
       .then(res => setHeroes(res.data))
       .catch(err => console.log(err));
-  }, []);
+  }, [props.history]);
 
   useEffect(() => {
-    console.log("user.class", user.class);
     if (user.class.length > 2) {
       props.history.push("/game");
     } else {
       props.history.push("/");
     }
-  }, [user.name]);
+  }, [user.name, props.history, user.class]);
 
   const onChoose = e => {
     let hero = heroes.find(el => el.class === e.target.name);
@@ -35,7 +34,6 @@ const GameRegistration = props => {
       )
       .then(() => props.history.push("/game"));
   };
-  console.log("user", props);
 
   return (
     <StyledGame>
@@ -53,6 +51,7 @@ const GameRegistration = props => {
                       name={item.class}
                       onClick={e => onChoose(e)}
                       src={img_heroes[item.class]}
+                      alt='img'
                     ></img>
                     <p>Hp: {item.hp}</p>
                     <p>Str: {item.str}</p>

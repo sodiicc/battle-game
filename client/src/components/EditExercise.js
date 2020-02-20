@@ -51,7 +51,6 @@ export const EditExercise = (props) => {
       ...exercise,
       username: e.target.value
     });
-    console.log('exercise', exercise)
   };
   const onChangeDescription = e => {
     setExercise({
@@ -76,7 +75,7 @@ export const EditExercise = (props) => {
 
     axios
       .post("/heroes/update/"+ props.match.params.id, exercise)
-      .then(res => console.log(res.data));
+      .then(res => '');
 
       props.history.push('/')
   };

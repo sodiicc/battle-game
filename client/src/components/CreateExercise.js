@@ -38,7 +38,6 @@ export const CreateExercise = (props) => {
       ...exercise,
       username: e.target.value
     });
-    console.log('exercise', exercise)
   };
   const onChangeDescription = e => {
     setExercise({
@@ -60,11 +59,10 @@ export const CreateExercise = (props) => {
   };
   const onSubmit = e => {
     e.preventDefault();
-    console.log("exercise", exercise);
 
     axios
       .post("/heroes/add", exercise)
-      .then(res => console.log(res.data));
+      .then(res => '');
     props.history.push('/')
   };
 

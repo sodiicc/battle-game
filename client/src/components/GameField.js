@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { img_all } from "../assets";
 import styled from "styled-components";
 import ChampCard from "./ChampCard";
 import axios from "axios";
 import ChoseEnemy from "./ChoseEnemy";
+import {
+  calculateCrit,
+  calculateBlock,
+  calculateAttack
+} from "./_additionalCimponents/calculateDmg";
 
 const GameField = props => {
   const user = useSelector(state => state.user);
-  console.log("user", user);
   const dispatch = useDispatch();
 
-  const [stats, setStats] = useState(
+  const [stats] = useState(
     !user.str
       ? {
           str: 14,
@@ -39,94 +42,120 @@ const GameField = props => {
 
   const [allEnemy, setAllEnemy] = useState([]);
   const [fightType, setFight] = useState([0, 0, 0]);
-  const [hp, setHp] = useState(Math.round(stats.hp * (1 + stats.vit / 30)));
+  const [hp,setHp] = useState(Math.round(stats.hp * (1 + stats.vit / 30)));
   const [enemyHp, setEnemyHp] = useState(0);
-  const [lowHp, setLowHp] = useState(Math.round(stats.hp * (1 + stats.vit / 30)));
-  const [lowEnemyHp, setLowEnemyHp] = useState(30);
-  const [enemyChamp, setEnemyChamp] = useState(false);
-  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0]);
-  const [result, setResult] = useState(null);
-
+  const [lowHp, setLowHp] = useState(
+    Math.round(stats.hp * (1 + stats.vit / 30))
+    );
+    const [lowEnemyHp, setLowEnemyHp] = useState(30);
+    const [enemyChamp, setEnemyChamp] = useState(false);
+    const [enemyDiff, setEnemyDiff] = useState([0, 0, 0]);
+    const [toUserDmg, setToUserDmg] = useState(0)  
+    const [toEnemyDmg, setToEnemyDmg] = useState(0)
+    const [showUserDmg, setShowUserDmg] = useState('');
+    const [showEnemyDmg, setShowEnemyDmg] = useState('');
+    const [result, setResult] = useState(null);
+    
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: stats });
     dispatch({ type: "SET_ENEMY_CHAMP", payload: enemyStats });
-  }, [stats, enemyStats]);
+  }, [stats, enemyStats, dispatch]);
 
   useEffect(() => {
-    axios
-      .get("/enemies")
-      .then(res => setAllEnemy(res.data))
+    axios.get("/enemies").then(res => setAllEnemy(res.data));
   }, []);
 
-  const [toUserDmg, setToUserDmg] = useState(
-    Math.round(
-      (enemyStats.str * (enemyStats.dex / stats.dex + enemyStats.agil / stats.agil)) / 2
-    )
-  );
-  const [toEnemyDmg, setToEnemyDmg] = useState(
-    Math.round(
-      (stats.str * (stats.dex / enemyStats.dex + stats.agil / enemyStats.agil)) / 2
-    )
-  );
-
-  const crit = type => {
-    let rand = Math.random();
-    // setToEnemyDmg(100)
-    console.log(
-      "rand",
-      0.15 + (-enemyStats.dex + stats.dex - enemyStats.agil + stats.agil) / 50
+  useEffect(() => {
+    setToEnemyDmg(
+      Math.round(
+          calculateCrit(
+            fightType.indexOf(true),
+            stats.dex,
+            stats.agil,
+            enemyStats.dex,
+            enemyStats.agil
+          )[0] *
+          calculateAttack(stats.lvl, stats.str, enemyStats.str, enemyStats.vit)
+      ) * calculateBlock(fightType.indexOf(true), enemyStats.dex, stats.str)[0]
     );
-    // if (type && rand < (0.95 + (enemyStats.dex - stats.dex + enemyStats.agil - stats.agil) / 50)) {
-    //   setToEnemyDmg(Math.round(toEnemyDmg * (1.5 + enemyStats.agil / stats.agil / 3)))
-    // } else if (!type && rand < (0.95 + (-enemyStats.dex + stats.dex - enemyStats.agil + stats.agil) / 50)) {
-    //   setToUserDmg(Math.round(toUserDmg * (1.5 + stats.agil / enemyStats.agil / 3)))
-    // }
-  };
+    setToUserDmg(
+      Math.round(
+          calculateCrit(
+            Math.floor(Math.random() * 3),
+            enemyStats.dex,
+            enemyStats.agil,
+            stats.dex,
+            stats.agil
+          )[0] *
+          calculateAttack(enemyStats.lvl, enemyStats.str, stats.str, stats.vit)
+      ) * calculateBlock(Math.floor(Math.random() * fightType.length), stats.dex, enemyStats.str )[0]
+    );
+  }, [fightType]);
 
-  const setKick = e => {
-    console.log("e", e.target.checked);
-  };
+  useEffect(() => {
+    if(lowEnemyHp <= 0 && lowHp > 0){
+      setResult('YOU WIN')
+      setShowUserDmg('')
+      setShowEnemyDmg('')
+    }else if(lowEnemyHp >= 0 && lowHp < 0){
+      setResult('YOU LOSE')
+      setShowUserDmg('')
+      setShowEnemyDmg('')      
+    }else if(lowEnemyHp <= 0 && lowHp <= 0){
+      setResult('DROW') 
+      setShowUserDmg('')
+      setShowEnemyDmg('')
+    }
+  },[lowEnemyHp, lowHp])
+
+  
 
   const generateFight = () => {
     setLowHp(hp => hp - toUserDmg);
     setLowEnemyHp(hp => hp - toEnemyDmg);
+    setShowEnemyDmg(toEnemyDmg)
+    setShowUserDmg(toUserDmg)
   };
 
   const fightBtn = () => {
-    generateFight();
-    setFight([0, 0, 0]);
+    if (fightType.includes(true)) {
+      generateFight();
+      setFight([0, 0, 0]);
+    }
   };
 
   const onChangeDiff = data => {
     let diff = [0, 0, 0];
     diff[data] = 1;
     setEnemyDiff(diff);
-    let rand = Math.random()
-    let lvlData = allEnemy.filter(el => el.lvl === stats.lvl+diff.indexOf(1))
-    let enemy = lvlData[Math.floor(rand*lvlData.length)]
-    console.log('enemy', enemy, allEnemy, lvlData)
-    setEnemy(enemy)
-    let hp = Math.round(enemy.hp * (1 + enemy.vit / 30))
-    setEnemyHp(hp)
-    setLowEnemyHp(hp)
+    let rand = Math.random();
+    let lvlData = allEnemy.filter(el => el.lvl === stats.lvl + diff.indexOf(1));
+    let enemy = lvlData[Math.floor(rand * lvlData.length)];
+    setEnemy(enemy);
+    let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));    
+    setEnemyHp(hp);
+    setLowEnemyHp(hp);
   };
-  const confirmDiff = () => {    
+
+  const confirmDiff = () => {
+    setHp( Math.round(stats.hp * (1 + stats.vit / 30)))
+    setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)))
+    setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)))
+    setLowHp(Math.round(stats.hp * (1 + stats.vit / 30)))
     setEnemyChamp(true);
-    setResult(null)
+    setResult(null);
+    setEnemyDiff([0, 0, 0])
+  };
+
+  const onSetType = set => {
+    setFight(set);
   };
 
   return (
     <StyledField>
       <div className="game-wrapper">
-        <ChampCard
-          isUser={true}
-          click={crit}
-          stats={stats}
-          dmg={toUserDmg}
-          hp={hp}
-          lowHp={lowHp}
-        />
-        {enemyChamp ? (
+        <ChampCard stats={stats} showDmg={showUserDmg} dmg={toUserDmg} hp={hp} lowHp={lowHp} />
+        {enemyChamp && !result ? (
           <div className="radio-wrapper">
             <div>
               <input
@@ -135,7 +164,7 @@ const GameField = props => {
                 name="char"
                 value="head"
                 checked={!!fightType[0]}
-                onChange={() => setFight([!fightType[0], 0, 0])}
+                onChange={() => onSetType([!fightType[0], 0, 0])}
               />
               <label htmlFor="kick1">head</label>
             </div>
@@ -146,7 +175,7 @@ const GameField = props => {
                 name="char"
                 value="body"
                 checked={!!fightType[1]}
-                onChange={() => setFight([0, !fightType[1], 0])}
+                onChange={() => onSetType([0, !fightType[1], 0])}
               />
               <label htmlFor="kick2">body</label>
             </div>
@@ -157,21 +186,23 @@ const GameField = props => {
                 name="char"
                 value="legs"
                 checked={!!fightType[2]}
-                onChange={() => setFight([0, 0, !fightType[2]])}
+                onChange={() => onSetType([0, 0, !fightType[2]])}
               />
               <label htmlFor="kick3">legs</label>
             </div>
             <button onClick={() => fightBtn()}>fight</button>
           </div>
         ) : null}
+        {
+         result ? <div>{result}</div> :null
+        }
         {enemyChamp && !result ? (
           <ChampCard
-            isUser={false}
-            click={crit}
             stats={enemyStats}
             dmg={toEnemyDmg}
             hp={enemyHp}
             lowHp={lowEnemyHp}
+            showDmg={showEnemyDmg}
           />
         ) : (
           <ChoseEnemy
