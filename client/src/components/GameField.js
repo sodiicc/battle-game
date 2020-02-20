@@ -194,7 +194,7 @@ const GameField = props => {
           </div>
         ) : null}
         {
-         result ? <div>{result}</div> :null
+         result ? <div className={`${result} result`}>{result}</div> :null
         }
         {enemyChamp && !result ? (
           <ChampCard
@@ -257,5 +257,18 @@ const StyledField = styled.div`
   .dificulty-logo {
     height: 70px;
     /* margin: 20px 10px; */
+  }
+  .result {
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .WIN {
+    color: #1aae40;
+  }
+  .LOSE {
+    color: #d81310;
+  }
+  .DRAW {
+    color: #b49349;
   }
 `;
