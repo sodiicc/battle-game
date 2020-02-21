@@ -8,16 +8,12 @@ router.route("/").get((req, res) => {
 });
 
 router.route("/add").post((req, res) => {
-
   const newEnemy = new Enemy(req.body);
 
   newEnemy
     .save()
-    .then(() =>
-      res
-        .json("Enemy added!")
-        )
-        .catch(err => res.status(400).json("Error: " + err))
+    .then(() => res.json("Enemy added!"))
+    .catch(err => res.status(400).json("Error: " + err));
 });
 
 router.route("/:id").get((req, res) => {

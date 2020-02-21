@@ -9,23 +9,25 @@ import {
   calculateBlock,
   calculateAttack
 } from "./_additionalCimponents/calculateDmg";
+// import { items } from "./_additionalCimponents/items";
 
 const GameField = props => {
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
 
-  const [stats] = useState(
+  const [userStats, setUser] = useState(
     !user.str
       ? {
-          str: 14,
-          dex: 15,
+          str: 24,
+          dex: 45,
           vit: 10,
           agil: 5,
           name: "Sodiicc",
           class: "mage",
-          exp: 0,
           hp: 70,
-          lvl: 1
+          lvl: 1,
+          exp: 0,
+          items: []
         }
       : user
   );
@@ -37,84 +39,153 @@ const GameField = props => {
     name: "Enemy",
     class: "warrior",
     exp: 0,
-    hp: 120
+    hp: 120,
+    lvl: 1
   });
 
+  const [calculatedStats, setCalculatedStats] = useState(userStats);
+  const [allItems, setAllItems] = useState([]);
   const [allEnemy, setAllEnemy] = useState([]);
   const [fightType, setFight] = useState([0, 0, 0]);
-  const [hp,setHp] = useState(Math.round(stats.hp * (1 + stats.vit / 30)));
+  const [hp, setHp] = useState(
+    Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30))
+  );
   const [enemyHp, setEnemyHp] = useState(0);
   const [lowHp, setLowHp] = useState(
-    Math.round(stats.hp * (1 + stats.vit / 30))
-    );
-    const [lowEnemyHp, setLowEnemyHp] = useState(30);
-    const [enemyChamp, setEnemyChamp] = useState(false);
-    const [enemyDiff, setEnemyDiff] = useState([0, 0, 0]);
-    const [toUserDmg, setToUserDmg] = useState(0)  
-    const [toEnemyDmg, setToEnemyDmg] = useState(0)
-    const [showUserDmg, setShowUserDmg] = useState('');
-    const [showEnemyDmg, setShowEnemyDmg] = useState('');
-    const [result, setResult] = useState(null);
-    
+    Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30))
+  );
+  const [lowEnemyHp, setLowEnemyHp] = useState(30);
+  const [enemyChamp, setEnemyChamp] = useState(false);
+  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0]);
+  const [toUserDmg, setToUserDmg] = useState(0);
+  const [toEnemyDmg, setToEnemyDmg] = useState(0);
+  const [showUserDmg, setShowUserDmg] = useState("");
+  const [showEnemyDmg, setShowEnemyDmg] = useState("");
+  const [result, setResult] = useState(null);
+  const [okResult, setOkResult] = useState(false);
+  const [drop, setDrop] = useState(null);
+  const [exp, setExp] = useState(0);
+  const [maxExp, setMaxExp] = useState(100);
+
   useEffect(() => {
-    dispatch({ type: "SET_USER_CHAMP", payload: stats });
+    dispatch({ type: "SET_USER_CHAMP", payload: userStats });
+  }, [userStats, dispatch]);
+
+  useEffect(() => {
     dispatch({ type: "SET_ENEMY_CHAMP", payload: enemyStats });
-  }, [stats, enemyStats, dispatch]);
+  }, [enemyStats, dispatch]);
+
+  useEffect(() => {
+    if (user.userChamp) {
+      setUser(user.userChamp);
+      if(user.userChamp) setCalcStats(user.userChamp);      
+    }
+  }, []);
+
+  const setCalcStats = (user) => {
+      console.log('user', user)
+      let item = user.items[0]
+      console.log('item', item)
+
+      let userCopy = user;
+      userCopy.hp += item.hp
+      userCopy.str += item.str
+      userCopy.dex += item.dex
+      userCopy.vit += item.vit
+      userCopy.agil += item.agil
+      setCalculatedStats(userCopy);    
+  }
 
   useEffect(() => {
     axios.get("/enemies").then(res => setAllEnemy(res.data));
+    axios.get("/items").then(res => setAllItems(res.data));
   }, []);
 
   useEffect(() => {
     setToEnemyDmg(
       Math.round(
-          calculateCrit(
-            fightType.indexOf(true),
-            stats.dex,
-            stats.agil,
-            enemyStats.dex,
-            enemyStats.agil
-          )[0] *
-          calculateAttack(stats.lvl, stats.str, enemyStats.str, enemyStats.vit)
-      ) * calculateBlock(fightType.indexOf(true), enemyStats.dex, stats.str)[0]
+        calculateCrit(
+          fightType.indexOf(true),
+          calculatedStats.dex,
+          calculatedStats.agil,
+          enemyStats.dex,
+          enemyStats.agil
+        )[0] *
+          calculateAttack(
+            calculatedStats.lvl,
+            calculatedStats.str,
+            enemyStats.str,
+            enemyStats.vit
+          )
+      ) *
+        calculateBlock(
+          fightType.indexOf(true),
+          enemyStats.dex,
+          calculatedStats.str
+        )[0]
     );
     setToUserDmg(
       Math.round(
-          calculateCrit(
-            Math.floor(Math.random() * 3),
-            enemyStats.dex,
-            enemyStats.agil,
-            stats.dex,
-            stats.agil
-          )[0] *
-          calculateAttack(enemyStats.lvl, enemyStats.str, stats.str, stats.vit)
-      ) * calculateBlock(Math.floor(Math.random() * fightType.length), stats.dex, enemyStats.str )[0]
+        calculateCrit(
+          Math.floor(Math.random() * 3),
+          enemyStats.dex,
+          enemyStats.agil,
+          calculatedStats.dex,
+          calculatedStats.agil
+        )[0] *
+          calculateAttack(
+            enemyStats.lvl,
+            enemyStats.str,
+            calculatedStats.str,
+            calculatedStats.vit
+          )
+      ) *
+        calculateBlock(
+          Math.floor(Math.random() * fightType.length),
+          calculatedStats.dex,
+          enemyStats.str
+        )[0]
     );
-  }, [fightType]);
+  }, [
+    fightType,
+    enemyStats.agil,
+    enemyStats.dex,
+    enemyStats.lvl,
+    enemyStats.str,
+    enemyStats.vit,
+    calculatedStats.agil,
+    calculatedStats.dex,
+    calculatedStats.lvl,
+    calculatedStats.str,
+    calculatedStats.vit
+  ]);
 
   useEffect(() => {
-    if(lowEnemyHp <= 0 && lowHp > 0){
-      setResult('YOU WIN')
-      setShowUserDmg('')
-      setShowEnemyDmg('')
-    }else if(lowEnemyHp >= 0 && lowHp < 0){
-      setResult('YOU LOSE')
-      setShowUserDmg('')
-      setShowEnemyDmg('')      
-    }else if(lowEnemyHp <= 0 && lowHp <= 0){
-      setResult('DROW') 
-      setShowUserDmg('')
-      setShowEnemyDmg('')
+    let rand = Math.random();
+    if (lowEnemyHp <= 0 && lowHp > 0) {
+      setRes("YOU WIN");
+      if (rand < 0.7)
+        setDrop(allItems[Math.floor(Math.random() * allItems.length)]);
+      setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
+    } else if (lowEnemyHp >= 0 && lowHp < 0) {
+      setRes("YOU LOSE");
+      setExp(Math.round(enemyStats.lvl * 2));
+    } else if (lowEnemyHp <= 0 && lowHp <= 0) {
+      setRes("DROW");
+      setExp(Math.round(enemyStats.lvl * 5));
     }
-  },[lowEnemyHp, lowHp])
+  }, [lowEnemyHp, lowHp, allItems, enemyStats.lvl, hp]);
 
-  
+  const setRes = res => {
+    setResult(res);
+    setOkResult(true);
+  };
 
   const generateFight = () => {
     setLowHp(hp => hp - toUserDmg);
     setLowEnemyHp(hp => hp - toEnemyDmg);
-    setShowEnemyDmg(toEnemyDmg)
-    setShowUserDmg(toUserDmg)
+    setShowEnemyDmg(toEnemyDmg);
+    setShowUserDmg(toUserDmg);
   };
 
   const fightBtn = () => {
@@ -129,32 +200,62 @@ const GameField = props => {
     diff[data] = 1;
     setEnemyDiff(diff);
     let rand = Math.random();
-    let lvlData = allEnemy.filter(el => el.lvl === stats.lvl + diff.indexOf(1));
+    let lvlData = allEnemy.filter(
+      el => el.lvl === userStats.lvl + diff.indexOf(1)
+    );
     let enemy = lvlData[Math.floor(rand * lvlData.length)];
     setEnemy(enemy);
-    let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));    
+    let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));
     setEnemyHp(hp);
     setLowEnemyHp(hp);
   };
 
   const confirmDiff = () => {
-    setHp( Math.round(stats.hp * (1 + stats.vit / 30)))
-    setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)))
-    setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)))
-    setLowHp(Math.round(stats.hp * (1 + stats.vit / 30)))
+    setHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
+    setLowHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
+    setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
+    setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setEnemyChamp(true);
+    setEnemyDiff([0, 0, 0]);
     setResult(null);
-    setEnemyDiff([0, 0, 0])
   };
 
   const onSetType = set => {
     setFight(set);
   };
 
+  const dropConfirm = () => {
+    let copyUser = JSON.parse(JSON.stringify(user.userChamp));
+    console.log('userStats', copyUser)
+    copyUser.exp += exp;
+    if (drop) {
+      let copyDrop = drop;
+      copyDrop.equipped = true;
+      copyUser.items.push(copyDrop);
+      setCalcStats(JSON.parse(JSON.stringify(copyUser)))
+    }
+    console.log('copyUser', copyUser)
+    dispatch({ type: "SET_USER_CHAMP", payload: copyUser });
+    setDrop(null);
+    setShowUserDmg("");
+    setShowEnemyDmg("");
+    setOkResult(false);
+  };
+
+  // console.log('user', user)
+
   return (
     <StyledField>
       <div className="game-wrapper">
-        <ChampCard stats={stats} showDmg={showUserDmg} dmg={toUserDmg} hp={hp} lowHp={lowHp} />
+        <ChampCard
+          stats={calculatedStats}
+          showDmg={showUserDmg}
+          dmg={toUserDmg}
+          hp={hp}
+          lowHp={lowHp}
+          exp={exp}
+          maxExp={maxExp}
+        />
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
             <div>
@@ -193,9 +294,12 @@ const GameField = props => {
             <button onClick={() => fightBtn()}>fight</button>
           </div>
         ) : null}
-        {
-         result ? <div className={`${result} result`}>{result}</div> :null
-        }
+        {result && okResult ? (
+          <div>
+            <div className={`${result} result`}>{result}</div>
+            <button onClick={() => dropConfirm()}>take drop</button>
+          </div>
+        ) : null}
         {enemyChamp && !result ? (
           <ChampCard
             stats={enemyStats}
@@ -204,14 +308,28 @@ const GameField = props => {
             lowHp={lowEnemyHp}
             showDmg={showEnemyDmg}
           />
-        ) : (
+        ) : !drop ? (
           <ChoseEnemy
             confirm={confirmDiff}
             diff={enemyDiff}
             changeDiff={onChangeDiff}
           />
-        )}
+        ): null}
       </div>
+      {drop ? (
+        <div className={`drop-wrapper ${drop.rar}`}>
+          <div className="Congratulations">
+            Congratulations !!! You have drop
+          </div>
+          <div>{drop.name || null}</div>
+          <div>rarity: {drop.rar || null}</div>
+          <div>level: {drop.lvl || null}</div>
+          <div>strength: {drop.str || null}</div>
+          <div>dextirity: {drop.dex || null}</div>
+          <div>vitality: {drop.vit || null}</div>
+          <div>agility: {drop.agil || null}</div>
+        </div>
+      ) : null}
     </StyledField>
   );
 };
@@ -228,18 +346,24 @@ const StyledField = styled.div`
   .hero-hp {
     display: inline-block;
     width: 10px;
-    background-color: #f55;
+    background-color: #d81310;
     align-self: flex-end;
     margin-right: 10px;
+  }
+  .hero-exp {
+    display: inline-block;
+    width: 10px;
+    background-color: #3044cf;
+    align-self: flex-end;
   }
   .img-wrapper {
     display: flex;
     position: relative;
   }
   .nickname {
-    font-size: 22px;
+    font-size: 18px;
   }
-  .stats-wrapper {
+  .userStats-wrapper {
     padding-top: 30px;
     width: 150px;
   }
@@ -270,5 +394,40 @@ const StyledField = styled.div`
   }
   .DRAW {
     color: #b49349;
+  }
+  .drop-wrapper {
+    text-align: center;
+    color: #1aae40;
+    div:nth-child(1) {
+      font-size: 30px;
+    }
+    div:nth-child(2) {
+      font-size: 24px;
+    }
+  }
+  .common {
+    color: #0003;
+  }
+  .normal {
+    color: #000;
+  }
+  .uncommon {
+    color: #1aae40;
+  }
+  .magic {
+    color: #3044cf;
+  }
+  .rare {
+    color: #9144af;
+  }
+  .legendary {
+    color: #b49349;
+  }
+  .epic {
+    color: #d81310;
+  }
+  .Congratulations {
+    color: #1aae40;
+    font-size: 30px;
   }
 `;

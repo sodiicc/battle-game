@@ -1,5 +1,5 @@
 const calculateCrit = (type, dex, agil, edex, eagil) => {
-  console.log("type", type);
+  // console.log("type", type);
   let rand = Math.random();
   let chance = 1;
   let power = 1;
@@ -18,7 +18,7 @@ const calculateCrit = (type, dex, agil, edex, eagil) => {
     isCrit = true
   }
 
-  console.log("{crotPower, critChance}", { power, chance });
+  // console.log("{crotPower, critChance}", { power, chance });
 
   return [power, isCrit]
 };
@@ -36,14 +36,14 @@ const calculateBlock = (type, dex, estr) => {
 
   } else if (rand < chance) block = 0;
 
-  console.log("chance block: ", chance);
+  // console.log("chance block: ", chance);
 
   return [block, !block]
 };
 
 const calculateAttack = ( lvl, str,  estr, evit) => {
   let attack = str+lvl + str / (estr*evit)*20 ;
-  console.log('attack: ', attack)
+  // console.log('attack: ', attack)
 
   return attack;
 };
