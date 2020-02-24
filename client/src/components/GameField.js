@@ -161,17 +161,22 @@ const GameField = props => {
   ]);
 
   const findItem = rar => {
-    allItems.find(el => el.lvl === enemyStats.lvl && el.rar === rar)[
+    console.log('allItems', allItems)
+    console.log('enemyStats', enemyStats)
+    console.log('rar', rar)
+   return allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar)[
       Math.floor(
         Math.random() *
-          find(el => el.lvl === enemyStats.lvl && el.rar === rar).length
+        allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar).length
       )
     ];
   };
 
-  const increaseDrop = () =>{
-    (enemyStats.lvl - userStats.lvl +1)
-  }
+  const increaseDrop = () => {
+
+    console.log('enemyStats.lvl - userStats.lvl +1', enemyStats.lvl - userStats.lvl +1)
+   return enemyStats.lvl - userStats.lvl +1
+  } 
 
   useEffect(() => {
     let rand = Math.random();
