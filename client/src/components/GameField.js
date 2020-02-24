@@ -18,13 +18,13 @@ const GameField = props => {
   const [userStats, setUser] = useState(
     !user.str
       ? {
-          str: 24,
-          dex: 45,
+          str: 100,
+          dex: 100,
           vit: 10,
-          agil: 5,
+          agil: 100,
           name: "Sodiicc",
           class: "mage",
-          hp: 70,
+          hp: 100,
           lvl: 1,
           exp: 0,
           items: []
@@ -69,7 +69,8 @@ const GameField = props => {
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
-  }, [userStats, dispatch]);
+    setMaxExp(userStats.lvl * 200);
+  }, [userStats]);
 
   useEffect(() => {
     dispatch({ type: "SET_ENEMY_CHAMP", payload: enemyStats });
@@ -78,23 +79,22 @@ const GameField = props => {
   useEffect(() => {
     if (user.userChamp) {
       setUser(user.userChamp);
-      if(user.userChamp) setCalcStats(user.userChamp);      
+      if (user.userChamp) setCalcStats(user.userChamp.items);
     }
-  }, []);
+  }, [user.userChamp]);
 
-  const setCalcStats = (user) => {
-      console.log('user', user)
-      let item = user.items[0]
-      console.log('item', item)
-
-      let userCopy = user;
-      userCopy.hp += item.hp
-      userCopy.str += item.str
-      userCopy.dex += item.dex
-      userCopy.vit += item.vit
-      userCopy.agil += item.agil
-      setCalculatedStats(userCopy);    
-  }
+  const setCalcStats = items => {
+    if (items.length) {
+      let item = items[items.length - 1];
+      let userCopy = JSON.parse(JSON.stringify(userStats));
+      userCopy.hp += item.hp;
+      userCopy.str += item.str;
+      userCopy.dex += item.dex;
+      userCopy.vit += item.vit;
+      userCopy.agil += item.agil;
+      setCalculatedStats(userCopy);
+    }
+  };
 
   useEffect(() => {
     axios.get("/enemies").then(res => setAllEnemy(res.data));
@@ -160,13 +160,31 @@ const GameField = props => {
     calculatedStats.vit
   ]);
 
+  const findItem = rar => {
+    allItems.find(el => el.lvl === enemyStats.lvl && el.rar === rar)[
+      Math.floor(
+        Math.random() *
+          find(el => el.lvl === enemyStats.lvl && el.rar === rar).length
+      )
+    ];
+  };
+
+  const increaseDrop = () =>{
+    (enemyStats.lvl - userStats.lvl +1)
+  }
+
   useEffect(() => {
     let rand = Math.random();
     if (lowEnemyHp <= 0 && lowHp > 0) {
       setRes("YOU WIN");
-      if (rand < 0.7)
-        setDrop(allItems[Math.floor(Math.random() * allItems.length)]);
       setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
+      if (rand < 0.001 * increaseDrop()) setDrop(findItem("epic"));
+      else if (rand < 0.003 * increaseDrop()) setDrop(findItem("legendary"));
+      else if (rand < 0.008 * increaseDrop()) setDrop(findItem("rare"));
+      else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
+      else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
+      else if (rand < 0.015 * increaseDrop()) setDrop(findItem("normal"));
+      else if (rand < 0.06 * increaseDrop()) setDrop(findItem("common"));
     } else if (lowEnemyHp >= 0 && lowHp < 0) {
       setRes("YOU LOSE");
       setExp(Math.round(enemyStats.lvl * 2));
@@ -225,24 +243,26 @@ const GameField = props => {
   };
 
   const dropConfirm = () => {
-    let copyUser = JSON.parse(JSON.stringify(user.userChamp));
-    console.log('userStats', copyUser)
+    let copyUser = JSON.parse(JSON.stringify(userStats));
     copyUser.exp += exp;
+    console.log("copyUserConfDropBEFORE", copyUser);
     if (drop) {
       let copyDrop = drop;
       copyDrop.equipped = true;
       copyUser.items.push(copyDrop);
-      setCalcStats(JSON.parse(JSON.stringify(copyUser)))
+      setCalcStats(copyUser.items);
     }
-    console.log('copyUser', copyUser)
-    dispatch({ type: "SET_USER_CHAMP", payload: copyUser });
+    if (copyUser.exp >= maxExp) {
+      copyUser.lvl += 1;
+      copyUser.exp -= maxExp;
+    }
+    console.log("copyUserConfDrop", copyUser);
+    setUser(copyUser);
     setDrop(null);
     setShowUserDmg("");
     setShowEnemyDmg("");
     setOkResult(false);
   };
-
-  // console.log('user', user)
 
   return (
     <StyledField>
@@ -253,7 +273,7 @@ const GameField = props => {
           dmg={toUserDmg}
           hp={hp}
           lowHp={lowHp}
-          exp={exp}
+          exp={userStats.exp}
           maxExp={maxExp}
         />
         {enemyChamp && !result ? (
@@ -314,7 +334,7 @@ const GameField = props => {
             diff={enemyDiff}
             changeDiff={onChangeDiff}
           />
-        ): null}
+        ) : null}
       </div>
       {drop ? (
         <div className={`drop-wrapper ${drop.rar}`}>

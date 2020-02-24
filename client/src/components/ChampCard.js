@@ -11,10 +11,10 @@ const ChampCard = props => {
               className="hero-exp"
               style={{
                 height: `${
-                  props.stats.exp < props.maxExp
-                    ? props.stats.exp < 0
+                  props.exp < props.maxExp
+                    ? props.exp <= 0
                       ? 5
-                      : (props.stats.exp / props.maxExp) * 300
+                      : (props.exp / props.maxExp) * 300
                     : 300
                 }px`
               }}
@@ -53,6 +53,7 @@ const ChampCard = props => {
           <p>Dex: {props.stats.dex}</p>
           <p>Vit: {props.stats.vit}</p>
           <p>Agil: {props.stats.agil}</p>
+          <p>Exp: {props.exp}</p>
         </div>
       </div>
     </div>
