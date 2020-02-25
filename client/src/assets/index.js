@@ -8,6 +8,10 @@ import warvar from "../assets/warvar.jfif";
 import hard from "../assets/hard.jpg";
 import normal from "../assets/normal.jfif";
 import easy from "../assets/easy.jfif";
+import dagger from "../assets/dagger.jpg";
+import sword from "../assets/sword.jpg";
+import axe from "../assets/axe.jpg";
+import staff from "../assets/staff.jpg";
 
 
 
@@ -15,6 +19,7 @@ const img_all = { warrior, assassin, mage, ogr, paladin, sorcery, warvar};
 const img_heroes = { warrior, assassin, mage, ogr };
 const img_enemies = { paladin, sorcery, warvar };
 const img_dificulties = { easy, normal, hard };
+const img_weapons = { dagger, sword, axe, staff };
 
 
 
@@ -24,3 +29,4 @@ export { img_all };
 export { img_heroes };
 export { img_enemies };
 export { img_dificulties };
+export { img_weapons };

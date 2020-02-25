@@ -9,6 +9,7 @@ import {
   calculateBlock,
   calculateAttack
 } from "./_additionalCimponents/calculateDmg";
+import { img_weapons } from "../assets";
 // import { items } from "./_additionalCimponents/items";
 
 const GameField = props => {
@@ -18,10 +19,10 @@ const GameField = props => {
   const [userStats, setUser] = useState(
     !user.str
       ? {
-          str: 100,
-          dex: 100,
-          vit: 10,
-          agil: 100,
+          str: 95,
+          dex: 125,
+          vit: 8,
+          agil: 15,
           name: "Sodiicc",
           class: "mage",
           hp: 100,
@@ -85,7 +86,7 @@ const GameField = props => {
 
   const setCalcStats = items => {
     if (items.length) {
-      let item = items[items.length - 1];
+      let item = items.find(el => el.equipped === true) || items[0];
       let userCopy = JSON.parse(JSON.stringify(userStats));
       userCopy.hp += item.hp;
       userCopy.str += item.str;
@@ -109,19 +110,22 @@ const GameField = props => {
           calculatedStats.dex,
           calculatedStats.agil,
           enemyStats.dex,
-          enemyStats.agil
+          enemyStats.agil,
+          userStats.class
         )[0] *
           calculateAttack(
             calculatedStats.lvl,
             calculatedStats.str,
             enemyStats.str,
-            enemyStats.vit
+            enemyStats.vit,
+            userStats.class
           )
       ) *
         calculateBlock(
           fightType.indexOf(true),
           enemyStats.dex,
-          calculatedStats.str
+          calculatedStats.str,
+          userStats.class
         )[0]
     );
     setToUserDmg(
@@ -131,19 +135,22 @@ const GameField = props => {
           enemyStats.dex,
           enemyStats.agil,
           calculatedStats.dex,
-          calculatedStats.agil
+          calculatedStats.agil,
+          userStats.class
         )[0] *
           calculateAttack(
             enemyStats.lvl,
             enemyStats.str,
             calculatedStats.str,
-            calculatedStats.vit
+            calculatedStats.vit,
+            userStats.class
           )
       ) *
         calculateBlock(
           Math.floor(Math.random() * fightType.length),
           calculatedStats.dex,
-          enemyStats.str
+          enemyStats.str,
+          userStats.class
         )[0]
     );
   }, [
@@ -161,22 +168,19 @@ const GameField = props => {
   ]);
 
   const findItem = rar => {
-    console.log('allItems', allItems)
-    console.log('enemyStats', enemyStats)
-    console.log('rar', rar)
-   return allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar)[
+    console.log("rar", rar);
+    return allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar)[
       Math.floor(
         Math.random() *
-        allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar).length
+          allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar)
+            .length
       )
     ];
   };
 
   const increaseDrop = () => {
-
-    console.log('enemyStats.lvl - userStats.lvl +1', enemyStats.lvl - userStats.lvl +1)
-   return enemyStats.lvl - userStats.lvl +1
-  } 
+    return enemyStats.lvl - userStats.lvl + 1;
+  };
 
   useEffect(() => {
     let rand = Math.random();
@@ -189,7 +193,7 @@ const GameField = props => {
       else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
       else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
       else if (rand < 0.015 * increaseDrop()) setDrop(findItem("normal"));
-      else if (rand < 0.06 * increaseDrop()) setDrop(findItem("common"));
+      else if (rand < 0.6 * increaseDrop()) setDrop(findItem("common"));
     } else if (lowEnemyHp >= 0 && lowHp < 0) {
       setRes("YOU LOSE");
       setExp(Math.round(enemyStats.lvl * 2));
@@ -250,23 +254,29 @@ const GameField = props => {
   const dropConfirm = () => {
     let copyUser = JSON.parse(JSON.stringify(userStats));
     copyUser.exp += exp;
-    console.log("copyUserConfDropBEFORE", copyUser);
     if (drop) {
       let copyDrop = drop;
-      copyDrop.equipped = true;
       copyUser.items.push(copyDrop);
-      setCalcStats(copyUser.items);
     }
     if (copyUser.exp >= maxExp) {
       copyUser.lvl += 1;
       copyUser.exp -= maxExp;
     }
-    console.log("copyUserConfDrop", copyUser);
     setUser(copyUser);
     setDrop(null);
     setShowUserDmg("");
     setShowEnemyDmg("");
     setOkResult(false);
+  };
+
+  const onEquip = ind => {
+    let copyStats = { ...userStats };
+    copyStats.items.forEach(element => {
+      element.equipped = false;
+    });
+    copyStats.items[ind].equipped = true;
+    setUser(copyStats);
+    setCalcStats(copyStats.items);
   };
 
   return (
@@ -280,6 +290,7 @@ const GameField = props => {
           lowHp={lowHp}
           exp={userStats.exp}
           maxExp={maxExp}
+          onEquip={onEquip}
         />
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
@@ -320,12 +331,11 @@ const GameField = props => {
           </div>
         ) : null}
         {result && okResult ? (
-          <div>
+          <div className="result-wrapper">
             <div className={`${result} result`}>{result}</div>
             <button onClick={() => dropConfirm()}>take drop</button>
           </div>
-        ) : null}
-        {enemyChamp && !result ? (
+        ) : enemyChamp && !result ? (
           <ChampCard
             stats={enemyStats}
             dmg={toEnemyDmg}
@@ -346,6 +356,7 @@ const GameField = props => {
           <div className="Congratulations">
             Congratulations !!! You have drop
           </div>
+          <img className="weapon-img-drop" alt='img' src={img_weapons[drop.img]}></img>
           <div>{drop.name || null}</div>
           <div>rarity: {drop.rar || null}</div>
           <div>level: {drop.lvl || null}</div>
@@ -454,5 +465,25 @@ const StyledField = styled.div`
   .Congratulations {
     color: #1aae40;
     font-size: 30px;
+  }
+  .result-wrapper {
+    padding-right: 20vw;
+  }
+  .weapon-img-drop {
+    width: 100px;
+    height: 100px;
+  }
+  .drop-box {
+    width: 300px;
+    img {
+      width: 50px;
+      margin: 1px;
+    }
+    .img-wrapper {
+      display: inline-block;
+    }
+    .equipped {
+      border: 2px #b49349 solid;
+    }
   }
 `;

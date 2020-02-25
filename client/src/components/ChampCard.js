@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { img_all } from "../assets";
+import { img_weapons } from "../assets";
 
 const ChampCard = props => {
+  const [hoverData, setData] = useState(null);
+
+  const onHover = el => {
+    setData(el);
+  };
+  const onBlur = el => {
+    setData(null);
+  };
+
   return (
     <div>
       <div className="card-wrapper">
         <div className="img-wrapper">
-          {props.stats.exp ? (
+          {props.exp ? (
             <div
               className="hero-exp"
               style={{
@@ -56,6 +66,39 @@ const ChampCard = props => {
           <p>Exp: {props.exp}</p>
         </div>
       </div>
+      {props.stats.items ? (
+        <div className="drop-box">
+          <div>
+            {props.stats.items.map((el, index) => {
+              return (
+                <div className="img-wrapper">
+                  <img
+                    onClick={() => props.onEquip(index)}
+                    onMouseEnter={() => onHover(el)}
+                    onMouseLeave={() => onBlur(el)}
+                    className={el.equipped ? "equipped" : ""}
+                    key={`${el.name + index}`}
+                    src={img_weapons[el.img]}
+                    alt='img'
+                  ></img>
+                </div>
+              );
+            })}
+            <div>
+              {hoverData ? (
+                <div>
+                  <p>{hoverData.name}</p>
+                  <p>Str: {hoverData.str}</p>
+                  <p>Dex: {hoverData.dex}</p>
+                  <p>Vit: {hoverData.vit}</p>
+                  <p>Agil: {hoverData.agil}</p>
+                  <p>Lvl: {hoverData.lvl}</p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };
