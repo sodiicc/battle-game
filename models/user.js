@@ -13,7 +13,8 @@ const userSchema = new Schema({
   dex: {type: Number, required:  false},
   vit: {type: Number, required:  false},
   agil: {type: Number, required:  false},
-  items: {type: Array, required:  false},
+  stats: {type: Number, required:  false},
+  items: {type: Array, required:  false}
 }, {
   timestamps: true,
 })
