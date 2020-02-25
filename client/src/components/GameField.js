@@ -197,7 +197,7 @@ const GameField = props => {
         else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
         else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
         else if (rand < 0.09 * increaseDrop()) setDrop(findItem("normal"));
-        else if (rand < 0.9 * increaseDrop()) setDrop(findItem("common"));
+        else if (rand < 0.2 * increaseDrop()) setDrop(findItem("common"));
       } else if (lowEnemyHp >= 0 && lowHp < 0) {
         setRes("YOU LOSE");
         setExp(Math.round(enemyStats.lvl * 2));
