@@ -1,5 +1,15 @@
 @import '~bootstrap/dist/css/bootstrap.css';
 
+:root {
+  --common: #999;
+  --normal: #000;
+  --uncommon: #1aae40;
+  --magic: #3044cf;
+  --rare: #9144af;
+  --legendary: #b49349;
+  --epic: #d81310;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe Print', BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

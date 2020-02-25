@@ -28,7 +28,8 @@ const GameField = props => {
           hp: 100,
           lvl: 1,
           exp: 0,
-          items: []
+          items: [],
+          stats: 3
         }
       : user
   );
@@ -41,7 +42,8 @@ const GameField = props => {
     class: "warrior",
     exp: 0,
     hp: 120,
-    lvl: 1
+    lvl: 1,
+    stats: 0
   });
 
   const [calculatedStats, setCalculatedStats] = useState(userStats);
@@ -70,6 +72,7 @@ const GameField = props => {
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
+    axios.post('/users/update', userStats)
     setMaxExp(userStats.lvl * 200);
   }, [userStats]);
 
@@ -184,22 +187,24 @@ const GameField = props => {
 
   useEffect(() => {
     let rand = Math.random();
-    if (lowEnemyHp <= 0 && lowHp > 0) {
-      setRes("YOU WIN");
-      setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
-      if (rand < 0.001 * increaseDrop()) setDrop(findItem("epic"));
-      else if (rand < 0.003 * increaseDrop()) setDrop(findItem("legendary"));
-      else if (rand < 0.008 * increaseDrop()) setDrop(findItem("rare"));
-      else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
-      else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
-      else if (rand < 0.015 * increaseDrop()) setDrop(findItem("normal"));
-      else if (rand < 0.6 * increaseDrop()) setDrop(findItem("common"));
-    } else if (lowEnemyHp >= 0 && lowHp < 0) {
-      setRes("YOU LOSE");
-      setExp(Math.round(enemyStats.lvl * 2));
-    } else if (lowEnemyHp <= 0 && lowHp <= 0) {
-      setRes("DROW");
-      setExp(Math.round(enemyStats.lvl * 5));
+    if(showUserDmg !== '') {
+      if (lowEnemyHp <= 0 && lowHp > 0) {
+        setRes("YOU WIN");
+        setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
+        if (rand < 0.001 * increaseDrop()) setDrop(findItem("epic"));
+        else if (rand < 0.003 * increaseDrop()) setDrop(findItem("legendary"));
+        else if (rand < 0.008 * increaseDrop()) setDrop(findItem("rare"));
+        else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
+        else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
+        else if (rand < 0.09 * increaseDrop()) setDrop(findItem("normal"));
+        else if (rand < 0.9 * increaseDrop()) setDrop(findItem("common"));
+      } else if (lowEnemyHp >= 0 && lowHp < 0) {
+        setRes("YOU LOSE");
+        setExp(Math.round(enemyStats.lvl * 2));
+      } else if (lowEnemyHp <= 0 && lowHp <= 0) {
+        setRes("DROW");
+        setExp(Math.round(enemyStats.lvl * 5));
+      }
     }
   }, [lowEnemyHp, lowHp, allItems, enemyStats.lvl, hp]);
 
@@ -243,7 +248,7 @@ const GameField = props => {
     setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setEnemyChamp(true);
-    setEnemyDiff([0, 0, 0]);
+    setEnemyDiff([0, 0, 0]);  
     setResult(null);
   };
 
@@ -260,13 +265,14 @@ const GameField = props => {
     }
     if (copyUser.exp >= maxExp) {
       copyUser.lvl += 1;
+      copyUser.stats += 3
       copyUser.exp -= maxExp;
     }
     setUser(copyUser);
     setDrop(null);
     setShowUserDmg("");
     setShowEnemyDmg("");
-    setOkResult(false);
+    setOkResult(false) 
   };
 
   const onEquip = ind => {
@@ -278,6 +284,17 @@ const GameField = props => {
     setUser(copyStats);
     setCalcStats(copyStats.items);
   };
+
+  const levelUp = stat => {
+    if(userStats.stats){
+      let copyStats = { ...userStats };
+      copyStats[stat] += 1
+      copyStats.stats -= 1
+      console.log('userStats', userStats, stat)
+      setUser(copyStats)
+      setCalculatedStats(copyStats)
+    }
+  }
 
   return (
     <StyledField>
@@ -291,6 +308,7 @@ const GameField = props => {
           exp={userStats.exp}
           maxExp={maxExp}
           onEquip={onEquip}
+          levelUp={levelUp}
         />
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
@@ -382,14 +400,14 @@ const StyledField = styled.div`
   .hero-hp {
     display: inline-block;
     width: 10px;
-    background-color: #d81310;
+    background-color: var(--epic);
     align-self: flex-end;
     margin-right: 10px;
   }
   .hero-exp {
     display: inline-block;
     width: 10px;
-    background-color: #3044cf;
+    background-color: var(--magic);
     align-self: flex-end;
   }
   .img-wrapper {
@@ -423,13 +441,13 @@ const StyledField = styled.div`
     font-weight: 700;
   }
   .WIN {
-    color: #1aae40;
+    color: var(--uncommon);
   }
   .LOSE {
-    color: #d81310;
+    color: var(--epic);
   }
   .DRAW {
-    color: #b49349;
+    color: var(--legendary);
   }
   .drop-wrapper {
     text-align: center;
@@ -442,28 +460,28 @@ const StyledField = styled.div`
     }
   }
   .common {
-    color: #0003;
+    color: var(--common);
   }
   .normal {
-    color: #000;
+    color: var(--normal);
   }
   .uncommon {
-    color: #1aae40;
+    color: var(--uncommon);
   }
   .magic {
-    color: #3044cf;
+    color: var(--magic);
   }
   .rare {
-    color: #9144af;
+    color: var(--rare);
   }
   .legendary {
-    color: #b49349;
+    color: var(--legendary);
   }
   .epic {
-    color: #d81310;
+    color: var(--epic);
   }
   .Congratulations {
-    color: #1aae40;
+    color: var(--uncommon);
     font-size: 30px;
   }
   .result-wrapper {
@@ -483,7 +501,16 @@ const StyledField = styled.div`
       display: inline-block;
     }
     .equipped {
-      border: 2px #b49349 solid;
+      border: 2px var(--legendary) solid;
     }
+  }
+  .add-stats {
+    font-weight: 600;
+    margin: 5px;
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid var(--legendary);
+    width: 20px;
+    text-align: center;
   }
 `;

@@ -59,11 +59,28 @@ const ChampCard = props => {
           <p>
             Hp: {props.lowHp}/{props.hp}
           </p>
-          <p>Str: {props.stats.str}</p>
-          <p>Dex: {props.stats.dex}</p>
-          <p>Vit: {props.stats.vit}</p>
-          <p>Agil: {props.stats.agil}</p>
-          <p>Exp: {props.exp}</p>
+          <div>
+          <span>Str: {props.stats.str}</span>{
+            props.stats.stats ?
+            <span onClick={() => props.levelUp('str')} className='add-stats'>+</span>: null}
+          </div>
+          <div>
+          <span>Dex: {props.stats.dex}</span>{
+            props.stats.stats ?
+            <span onClick={() => props.levelUp('dex')} className='add-stats'>+</span>: null}
+          </div>
+          <div>
+          <span>Vit: {props.stats.vit}</span>{
+            props.stats.stats ?
+            <span onClick={() => props.levelUp('vit')} className='add-stats'>+</span>: null}
+          </div>
+          <div>
+          <span>Agil: {props.stats.agil}</span>{
+            props.stats.stats ?
+            <span onClick={() => props.levelUp('agil')} className='add-stats'>+</span>: null}
+          </div>
+          <p>Exp: {props.exp}/{props.maxExp}</p>
+          <p>Free stats: {props.stats.stats}</p>
         </div>
       </div>
       {props.stats.items ? (
@@ -71,13 +88,12 @@ const ChampCard = props => {
           <div>
             {props.stats.items.map((el, index) => {
               return (
-                <div className="img-wrapper">
+                <div key={`${el.name + index}`} className="img-wrapper">
                   <img
                     onClick={() => props.onEquip(index)}
                     onMouseEnter={() => onHover(el)}
                     onMouseLeave={() => onBlur(el)}
-                    className={el.equipped ? "equipped" : ""}
-                    key={`${el.name + index}`}
+                    className={el.equipped ? `equipped ${el.rare}` : el.rare}                    
                     src={img_weapons[el.img]}
                     alt='img'
                   ></img>
@@ -86,8 +102,9 @@ const ChampCard = props => {
             })}
             <div>
               {hoverData ? (
-                <div>
+                <div className={hoverData.rar}>
                   <p>{hoverData.name}</p>
+                  <p>Rarity: {hoverData.rar}</p>
                   <p>Str: {hoverData.str}</p>
                   <p>Dex: {hoverData.dex}</p>
                   <p>Vit: {hoverData.vit}</p>
