@@ -11,6 +11,7 @@ const ChampCard = props => {
   const onBlur = el => {
     setData(null);
   };
+  console.log('setData', props.chances)
 
   return (
     <div>
@@ -60,26 +61,40 @@ const ChampCard = props => {
             Hp: {props.lowHp}/{props.hp}
           </p>
           <div>
-          <span>Str: {props.stats.str}</span>{
-            props.stats.stats ?
-            <span onClick={() => props.levelUp('str')} className='add-stats'>+</span>: null}
+            <span>Str: {props.stats.str}</span>
+            {props.stats.stats ? (
+              <span onClick={() => props.levelUp("str")} className="add-stats">
+                +
+              </span>
+            ) : null}
           </div>
           <div>
-          <span>Dex: {props.stats.dex}</span>{
-            props.stats.stats ?
-            <span onClick={() => props.levelUp('dex')} className='add-stats'>+</span>: null}
+            <span>Dex: {props.stats.dex}</span>
+            {props.stats.stats ? (
+              <span onClick={() => props.levelUp("dex")} className="add-stats">
+                +
+              </span>
+            ) : null}
           </div>
           <div>
-          <span>Vit: {props.stats.vit}</span>{
-            props.stats.stats ?
-            <span onClick={() => props.levelUp('vit')} className='add-stats'>+</span>: null}
+            <span>Vit: {props.stats.vit}</span>
+            {props.stats.stats ? (
+              <span onClick={() => props.levelUp("vit")} className="add-stats">
+                +
+              </span>
+            ) : null}
           </div>
           <div>
-          <span>Agil: {props.stats.agil}</span>{
-            props.stats.stats ?
-            <span onClick={() => props.levelUp('agil')} className='add-stats'>+</span>: null}
+            <span>Agil: {props.stats.agil}</span>
+            {props.stats.stats ? (
+              <span onClick={() => props.levelUp("agil")} className="add-stats">
+                +
+              </span>
+            ) : null}                
           </div>
-          <p>Exp: {props.exp}/{props.maxExp}</p>
+          <p>
+            Exp: {props.exp}/{props.maxExp}
+          </p>
           <p>Free stats: {props.stats.stats}</p>
         </div>
       </div>
@@ -93,9 +108,9 @@ const ChampCard = props => {
                     onClick={() => props.onEquip(index)}
                     onMouseEnter={() => onHover(el)}
                     onMouseLeave={() => onBlur(el)}
-                    className={el.equipped ? `equipped ${el.rare}` : el.rare}                    
+                    className={el.equipped ? `equipped ${el.rare}` : el.rare}
                     src={img_weapons[el.img]}
-                    alt='img'
+                    alt="img"
                   ></img>
                 </div>
               );
@@ -116,6 +131,14 @@ const ChampCard = props => {
           </div>
         </div>
       ) : null}
+      {props.chances ? (
+                  <div>
+                    <p>crit chance: {props.chances[0].toFixed(2)} %</p>
+                    <p>crit power: {props.chances[3].toFixed(2)} %</p>
+                    <p>block: {props.chances[1].toFixed(2)} %</p>
+                    <p>attack: {props.chances[2].toFixed(2)} HP</p>
+                  </div>
+                ) : null}
     </div>
   );
 };

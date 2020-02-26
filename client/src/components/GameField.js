@@ -69,10 +69,12 @@ const GameField = props => {
   const [drop, setDrop] = useState(null);
   const [exp, setExp] = useState(0);
   const [maxExp, setMaxExp] = useState(100);
+  const [usrDMG, setUsrDMG] = useState([0, 0, 0, 0]);
+  const [enemyDMG, setEnemyDMG] = useState([0, 0, 0, 0]);
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
-    axios.post('/users/update', userStats)
+    axios.post("/users/update", userStats);
     setMaxExp(userStats.lvl * 200);
   }, [userStats]);
 
@@ -106,6 +108,69 @@ const GameField = props => {
   }, []);
 
   useEffect(() => {
+    setUsrDMG([
+      calculateCrit(
+        fightType.indexOf(true),
+        calculatedStats.dex,
+        calculatedStats.agil,
+        enemyStats.dex,
+        enemyStats.agil,
+        userStats.class
+      )[2] * 100,
+      calculateBlock(
+        fightType.indexOf(true),
+        calculatedStats.dex,
+        enemyStats.str,
+        userStats.class
+      )[2] * 100,
+      calculateAttack(
+        calculatedStats.lvl,
+        calculatedStats.str,
+        enemyStats.str,
+        enemyStats.vit,
+        userStats.class
+      ),
+      calculateCrit(
+        fightType.indexOf(true),
+        calculatedStats.dex,
+        calculatedStats.agil,
+        enemyStats.dex,
+        enemyStats.agil,
+        userStats.class
+      )[3] * 100
+    ]);
+    setEnemyDMG([
+      calculateCrit(
+        Math.floor(Math.random() * 3),
+        enemyStats.dex,
+        enemyStats.agil,
+        calculatedStats.dex,
+        calculatedStats.agil,
+        enemyStats.class
+      )[2] * 100,
+      calculateBlock(
+        Math.floor(Math.random() * fightType.length),
+        enemyStats.dex,
+        calculatedStats.str,
+        enemyStats.class
+      )[2] * 100,
+      calculateAttack(
+        enemyStats.lvl,
+        enemyStats.str,
+        calculatedStats.str,
+        calculatedStats.vit,
+        enemyStats.class
+      ),
+      calculateCrit(
+        Math.floor(Math.random() * 3),
+        enemyStats.dex,
+        enemyStats.agil,
+        calculatedStats.dex,
+        calculatedStats.agil,
+        enemyStats.class
+      )[3] * 100
+    ]);
+
     setToEnemyDmg(
       Math.round(
         calculateCrit(
@@ -139,21 +204,21 @@ const GameField = props => {
           enemyStats.agil,
           calculatedStats.dex,
           calculatedStats.agil,
-          userStats.class
+          enemyStats.class
         )[0] *
           calculateAttack(
             enemyStats.lvl,
             enemyStats.str,
             calculatedStats.str,
             calculatedStats.vit,
-            userStats.class
+            enemyStats.class
           )
       ) *
         calculateBlock(
           Math.floor(Math.random() * fightType.length),
           calculatedStats.dex,
           enemyStats.str,
-          userStats.class
+          enemyStats.class
         )[0]
     );
   }, [
@@ -187,7 +252,7 @@ const GameField = props => {
 
   useEffect(() => {
     let rand = Math.random();
-    if(showUserDmg !== '') {
+    if (showUserDmg !== "") {
       if (lowEnemyHp <= 0 && lowHp > 0) {
         setRes("YOU WIN");
         setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
@@ -248,7 +313,7 @@ const GameField = props => {
     setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setEnemyChamp(true);
-    setEnemyDiff([0, 0, 0]);  
+    setEnemyDiff([0, 0, 0]);
     setResult(null);
   };
 
@@ -265,14 +330,14 @@ const GameField = props => {
     }
     if (copyUser.exp >= maxExp) {
       copyUser.lvl += 1;
-      copyUser.stats += 3
+      copyUser.stats += 3;
       copyUser.exp -= maxExp;
     }
     setUser(copyUser);
     setDrop(null);
     setShowUserDmg("");
     setShowEnemyDmg("");
-    setOkResult(false) 
+    setOkResult(false);
   };
 
   const onEquip = ind => {
@@ -286,15 +351,15 @@ const GameField = props => {
   };
 
   const levelUp = stat => {
-    if(userStats.stats){
+    if (userStats.stats) {
       let copyStats = { ...userStats };
-      copyStats[stat] += 1
-      copyStats.stats -= 1
-      console.log('userStats', userStats, stat)
-      setUser(copyStats)
-      setCalculatedStats(copyStats)
+      copyStats[stat] += 1;
+      copyStats.stats -= 1;
+      console.log("userStats", userStats, stat);
+      setUser(copyStats);
+      setCalculatedStats(copyStats);
     }
-  }
+  };
 
   return (
     <StyledField>
@@ -309,6 +374,7 @@ const GameField = props => {
           maxExp={maxExp}
           onEquip={onEquip}
           levelUp={levelUp}
+          chances={usrDMG}
         />
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
@@ -360,6 +426,7 @@ const GameField = props => {
             hp={enemyHp}
             lowHp={lowEnemyHp}
             showDmg={showEnemyDmg}
+            chances={enemyDMG}
           />
         ) : !drop ? (
           <ChoseEnemy
@@ -374,7 +441,11 @@ const GameField = props => {
           <div className="Congratulations">
             Congratulations !!! You have drop
           </div>
-          <img className="weapon-img-drop" alt='img' src={img_weapons[drop.img]}></img>
+          <img
+            className="weapon-img-drop"
+            alt="img"
+            src={img_weapons[drop.img]}
+          ></img>
           <div>{drop.name || null}</div>
           <div>rarity: {drop.rar || null}</div>
           <div>level: {drop.lvl || null}</div>
