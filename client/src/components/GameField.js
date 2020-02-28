@@ -19,13 +19,13 @@ const GameField = props => {
   const [userStats, setUser] = useState(
     !user.str
       ? {
-          str: 95,
-          dex: 125,
-          vit: 8,
-          agil: 15,
+          str: 12,
+          dex: 3,
+          vit: 17,
+          agil: 5,
           name: "Sodiicc",
-          class: "mage",
-          hp: 100,
+          class: "ogr",
+          hp: 120,
           lvl: 1,
           exp: 0,
           items: [],
@@ -59,7 +59,7 @@ const GameField = props => {
   );
   const [lowEnemyHp, setLowEnemyHp] = useState(30);
   const [enemyChamp, setEnemyChamp] = useState(false);
-  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0]);
+  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0, 0]);
   const [toUserDmg, setToUserDmg] = useState(0);
   const [toEnemyDmg, setToEnemyDmg] = useState(0);
   const [showUserDmg, setShowUserDmg] = useState("");
@@ -263,7 +263,7 @@ const GameField = props => {
         else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
         else if (rand < 0.09 * increaseDrop()) setDrop(findItem("normal"));
         else if (rand < 0.2 * increaseDrop()) setDrop(findItem("common"));
-      } else if (lowEnemyHp >= 0 && lowHp < 0) {
+      } else if (lowEnemyHp > 0 && lowHp <= 0) {
         setRes("YOU LOSE");
         setExp(Math.round(enemyStats.lvl * 2));
       } else if (lowEnemyHp <= 0 && lowHp <= 0) {
@@ -293,13 +293,16 @@ const GameField = props => {
   };
 
   const onChangeDiff = data => {
-    let diff = [0, 0, 0];
+    let diff = [0, 0, 0, 0];
     diff[data] = 1;
     setEnemyDiff(diff);
     let rand = Math.random();
-    let lvlData = allEnemy.filter(
-      el => el.lvl === userStats.lvl + diff.indexOf(1)
-    );
+    let lvlData
+    if(data === 3){
+      lvlData = allEnemy.filter(el => el.lvl === 5)
+    }else{
+      lvlData = allEnemy.filter( el => el.lvl === userStats.lvl + diff.indexOf(1))
+    }
     let enemy = lvlData[Math.floor(rand * lvlData.length)];
     setEnemy(enemy);
     let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));
@@ -308,12 +311,13 @@ const GameField = props => {
   };
 
   const confirmDiff = () => {
+    console.log('confirmDiff')
     setHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
     setLowHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
     setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setEnemyChamp(true);
-    setEnemyDiff([0, 0, 0]);
+    setEnemyDiff([0, 0, 0, 0]);
     setResult(null);
   };
 

@@ -53,9 +53,24 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
               <label htmlFor="dificulti3"></label>
             </div>
           </div>
+          <div className="diff">
+            <p>Boss</p>
+            <img className="dificulty-logo" src={img_dificulties.hell} alt='img'></img>
+            <div>
+              <input
+                type="radio"
+                checked={!!diff[3]}
+                onChange={() => changeDiff(3)}
+                id="dificulti4"
+                name="diff"
+                value="boss"
+              />
+              <label htmlFor="dificulti4"></label>
+            </div>
+          </div>
         </div>
           <button onClick={() => {
-            if(diff[0] || diff[1] || diff[2]) confirm()
+            if(diff[0] || diff[1] || diff[2] || diff[3]) confirm()
           }}>confirm</button>
       </div>
     </StyledDiv>

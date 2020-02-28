@@ -12,13 +12,15 @@ import dagger from "../assets/dagger.jpg";
 import sword from "../assets/sword.jpg";
 import axe from "../assets/axe.jpg";
 import staff from "../assets/staff.jpg";
+import hell from "../assets/hell.webp";
+import boss from "../assets/boss.jfif";
 
 
 
-const img_all = { warrior, assassin, mage, ogr, paladin, sorcery, warvar};
+const img_all = { warrior, assassin, mage, ogr, paladin, sorcery, warvar, boss};
 const img_heroes = { warrior, assassin, mage, ogr };
 const img_enemies = { paladin, sorcery, warvar };
-const img_dificulties = { easy, normal, hard };
+const img_dificulties = { easy, normal, hard, hell };
 const img_weapons = { dagger, sword, axe, staff };
 
 

@@ -4,7 +4,7 @@ const calculateCrit = (type, dex, agil, edex, eagil, hero) => {
   let power = 1;
   let isCrit = false;
 
-  chance = 0.05 + dex / edex / 6;
+  chance = 0.05 + dex / edex / 10;
   if (hero === "assassin") chance *= 1.3;
   
   if (type === 0) chance *= 1.3
@@ -50,7 +50,7 @@ const calculateBlock = (type, dex, estr, hero) => {
   let chance = 0;
   let block = 1;
 
-  chance = 0.05 + dex / estr / 8;
+  chance = 0.05 + dex / estr / 10;
   if (hero === "warrior") chance *= 1.2
   if (type === 2) chance *= 1.3
   
@@ -58,7 +58,7 @@ const calculateBlock = (type, dex, estr, hero) => {
     block = 0;
   } else if (rand < chance) block = 0;
   
-  console.log('chance', chance, dex, estr)
+  // console.log('chance', chance, dex, estr)
   return [block, !block, chance];
 };
 

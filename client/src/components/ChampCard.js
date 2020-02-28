@@ -11,7 +11,7 @@ const ChampCard = props => {
   const onBlur = el => {
     setData(null);
   };
-  console.log('setData', props.chances)
+  // console.log('setData', props.chances)
 
   return (
     <div>
