@@ -17,22 +17,22 @@ const GameField = props => {
   const dispatch = useDispatch();
 
   const [userStats, setUser] = useState(
-    !user.str
-      ? {
-          str: 12,
-          dex: 3,
-          vit: 17,
-          agil: 5,
-          name: "Sodiicc",
-          class: "ogr",
-          hp: 120,
-          lvl: 1,
-          exp: 0,
-          items: [],
-          stats: 3
-        }
-      : user
-  );
+    !user.str && !JSON.parse(localStorage.getItem("userChamp")).str
+    ? {
+      str: 12,
+      dex: 3,
+      vit: 17,
+      agil: 5,
+      name: "Sodiicc",
+      class: "ogr",
+      hp: 120,
+      lvl: 1,
+      exp: 0,
+      items: [],
+      stats: 3
+    }
+    : JSON.parse(localStorage.getItem("userChamp"))
+    );
   const [enemyStats, setEnemy] = useState({
     str: 13,
     dex: 15,
@@ -75,7 +75,7 @@ const GameField = props => {
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
     axios.post("/users/update", userStats);
-    setMaxExp(userStats.lvl * 200);
+    setMaxExp(userStats.lvl * 250);
   }, [userStats]);
 
   useEffect(() => {
@@ -88,11 +88,14 @@ const GameField = props => {
       if (user.userChamp) setCalcStats(user.userChamp.items);
     }
   }, [user.userChamp]);
+  useEffect(() => {
+    if(userStats.items.length)setCalcStats(userStats.items)
+  }, [userStats.items])
 
   const setCalcStats = items => {
+    let userCopy = JSON.parse(JSON.stringify(userStats));
     if (items.length) {
       let item = items.find(el => el.equipped === true) || items[0];
-      let userCopy = JSON.parse(JSON.stringify(userStats));
       userCopy.hp += item.hp;
       userCopy.str += item.str;
       userCopy.dex += item.dex;
@@ -262,7 +265,7 @@ const GameField = props => {
         else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
         else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
         else if (rand < 0.09 * increaseDrop()) setDrop(findItem("normal"));
-        else if (rand < 0.2 * increaseDrop()) setDrop(findItem("common"));
+        else if (rand < 0.9 * increaseDrop()) setDrop(findItem("common"));
       } else if (lowEnemyHp > 0 && lowHp <= 0) {
         setRes("YOU LOSE");
         setExp(Math.round(enemyStats.lvl * 2));
@@ -311,7 +314,6 @@ const GameField = props => {
   };
 
   const confirmDiff = () => {
-    console.log('confirmDiff')
     setHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
     setLowHp(Math.round(calculatedStats.hp * (1 + calculatedStats.vit / 30)));
     setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
@@ -337,6 +339,11 @@ const GameField = props => {
       copyUser.stats += 3;
       copyUser.exp -= maxExp;
     }
+    if(copyUser.items.length) {
+      setCalcStats(copyUser.items)
+    }else {
+      setCalculatedStats(copyUser)
+    }
     setUser(copyUser);
     setDrop(null);
     setShowUserDmg("");
@@ -350,8 +357,8 @@ const GameField = props => {
       element.equipped = false;
     });
     copyStats.items[ind].equipped = true;
-    setUser(copyStats);
     setCalcStats(copyStats.items);
+    setUser(copyStats);
   };
 
   const levelUp = stat => {
@@ -359,9 +366,12 @@ const GameField = props => {
       let copyStats = { ...userStats };
       copyStats[stat] += 1;
       copyStats.stats -= 1;
-      console.log("userStats", userStats, stat);
       setUser(copyStats);
-      setCalculatedStats(copyStats);
+      if(userStats.items.length) {
+        setCalcStats(copyStats.items)
+      }else {
+        setCalculatedStats(copyStats)
+      }
     }
   };
 

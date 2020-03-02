@@ -15,7 +15,7 @@ export const Navbar = () => {
       <Link to='/' className='navbar-brand' >Battle Game</Link>
       <UserLogo />
       {
-        !user.name.length ?
+        !user.name.length  ?
           <div className='login-wrapper'>
             <RegisterModal />
             <LoginModal />
