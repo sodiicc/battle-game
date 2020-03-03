@@ -71,6 +71,7 @@ const GameField = props => {
   const [maxExp, setMaxExp] = useState(100);
   const [usrDMG, setUsrDMG] = useState([0, 0, 0, 0]);
   const [enemyDMG, setEnemyDMG] = useState([0, 0, 0, 0]);
+  const [dropChance, setDropChance] = useState(1.5);
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
@@ -259,13 +260,13 @@ const GameField = props => {
       if (lowEnemyHp <= 0 && lowHp > 0) {
         setRes("YOU WIN");
         setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
-        if (rand < 0.001 * increaseDrop()) setDrop(findItem("epic"));
-        else if (rand < 0.003 * increaseDrop()) setDrop(findItem("legendary"));
-        else if (rand < 0.008 * increaseDrop()) setDrop(findItem("rare"));
-        else if (rand < 0.015 * increaseDrop()) setDrop(findItem("magic"));
-        else if (rand < 0.035 * increaseDrop()) setDrop(findItem("uncommon"));
-        else if (rand < 0.09 * increaseDrop()) setDrop(findItem("normal"));
-        else if (rand < 0.9 * increaseDrop()) setDrop(findItem("common"));
+        if (rand < 0.001 * increaseDrop() * dropChance) setDrop(findItem("epic"));
+        else if (rand < 0.003 * increaseDrop() * dropChance) setDrop(findItem("legendary"));
+        else if (rand < 0.008 * increaseDrop() * dropChance) setDrop(findItem("rare"));
+        else if (rand < 0.015 * increaseDrop() * dropChance) setDrop(findItem("magic"));
+        else if (rand < 0.035 * increaseDrop() * dropChance) setDrop(findItem("uncommon"));
+        else if (rand < 0.09 * increaseDrop() * dropChance) setDrop(findItem("normal"));
+        else if (rand < 0.2 * increaseDrop() * dropChance) setDrop(findItem("common"));
       } else if (lowEnemyHp > 0 && lowHp <= 0) {
         setRes("YOU LOSE");
         setExp(Math.round(enemyStats.lvl * 2));
