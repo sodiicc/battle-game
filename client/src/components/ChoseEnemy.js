@@ -1,12 +1,33 @@
-import React from "react";
+import React, {useState} from "react";
 import { img_dificulties } from "../assets";
 import styled from "styled-components";
 
 const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
+
+  const [lvl, setLvl] = useState(1)
+
+  const setDiff = (e) => {
+    setLvl(+e)
+    changeDiff(4, +e)
+  }
+
   return (
     <StyledDiv>
       <div>
         <div>Сhoose the difficulty of your opponent</div>
+        <div>custom level
+              <input
+              className='ml-3'
+                type="radio"
+                id="dificulti5"
+                name="diff"
+                value="custom"
+                checked={!!diff[4]}
+                onChange={(e) => changeDiff(4, lvl)}
+              />
+              <label htmlFor="dificulti5"></label>
+              <input className='ml-1' min='1' max='5' placeholder='choose enemy level' type='number' value={lvl} onChange={(e) => setDiff(+e.target.value)} />
+            </div>
         <div className="diff-wrapper">
           <div className="diff">
             <p>easy</p>
@@ -70,7 +91,7 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
           </div>
         </div>
           <button onClick={() => {
-            if(diff[0] || diff[1] || diff[2] || diff[3]) confirm()
+            if(diff[0] || diff[1] || diff[2] || diff[3] || diff[4]) confirm()
           }}>confirm</button>
       </div>
     </StyledDiv>

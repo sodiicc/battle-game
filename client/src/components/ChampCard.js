@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { img_all } from "../assets";
 import { img_weapons } from "../assets";
+import ReactTooltip from "react-tooltip";
 
 const ChampCard = props => {
   const [hoverData, setData] = useState(null);
@@ -103,7 +104,9 @@ const ChampCard = props => {
           <div>
             {props.stats.items.map((el, index) => {
               return (
-                <div key={`${el.name + index}`} className="img-wrapper">
+                <div key={`${el.name + index}`} data-for={el.name + index}
+                data-type="info"
+                data-tip={`${el.name}<br />Level: ${el.lvl}<br />Rarity: ${el.rar}<br />Hp: ${el.hp}<br />Str: ${el.str}<br />Dex: ${el.dex}<br />Vit: ${el.vit}<br />Agil: ${el.agil}`} className="img-wrapper">
                   <img
                     onClick={() => props.onEquip(index)}
                     onMouseEnter={() => onHover(el)}
@@ -111,11 +114,15 @@ const ChampCard = props => {
                     className={el.equipped ? `equipped ${el.rare}` : el.rare}
                     src={img_weapons[el.img]}
                     alt="img"
+
                   ></img>
+                  <ReactTooltip
+                  backgroundColor='#def'
+                   className={el.rar} multiline={true} id={el.name + index} />
                 </div>
               );
             })}
-            <div>
+            {/* <div>
               {hoverData ? (
                 <div className={hoverData.rar}>
                   <p>{hoverData.name}</p>
@@ -127,14 +134,14 @@ const ChampCard = props => {
                   <p>Lvl: {hoverData.lvl}</p>
                 </div>
               ) : null}
-            </div>
+            </div> */}
           </div>
         </div>
       ) : null}
       {props.chances ? (
                   <div>
                     <p>crit chance: {props.chances[0].toFixed(2)} %</p>
-                    <p>crit power: {props.chances[3].toFixed(2)} %</p>
+                    {/* <p>crit power: {props.chances[3].toFixed(2)} %</p> */}
                     <p>block: {props.chances[1].toFixed(2)} %</p>
                     <p>attack: {props.chances[2].toFixed(2)} HP</p>
                   </div>

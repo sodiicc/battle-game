@@ -11,7 +11,7 @@ const calculateCrit = (type, dex, agil, edex, eagil, hero) => {
 
   let randPower=1
   if (type === 1) {
-    randPower = 0.96 * (1 + Math.random() / 2);
+    randPower = 1.12 * (1 + Math.random() / 2);
     randPower = randPower * (1.3 + agil / eagil) * 1.2;
     if (hero === "mage") {
       randPower *= 1.5;
@@ -24,7 +24,7 @@ const calculateCrit = (type, dex, agil, edex, eagil, hero) => {
     randPower = 0.8 * (1 + Math.random() / 2);
     randPower = randPower * (1.3 + agil / eagil) * 1.2;
     if (hero === "mage") {
-      randPower *= 1.5;
+      randPower *= 1.6;
     }
     if(rand < chance) {
       power = randPower
@@ -34,7 +34,7 @@ const calculateCrit = (type, dex, agil, edex, eagil, hero) => {
     randPower = 0.75 * (1 + Math.random() / 2);
     randPower = randPower * (1.3 + agil / eagil) * 1.2;
     if (hero === "mage") {
-      randPower *= 1.5;
+      randPower *= 1.6;
     }
     if(rand < chance) {
       power = randPower

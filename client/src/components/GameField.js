@@ -10,6 +10,7 @@ import {
   calculateAttack
 } from "./_additionalCimponents/calculateDmg";
 import { img_weapons } from "../assets";
+import ReactTooltip from "react-tooltip";
 // import { items } from "./_additionalCimponents/items";
 
 const GameField = props => {
@@ -18,21 +19,21 @@ const GameField = props => {
 
   const [userStats, setUser] = useState(
     !user.str && !JSON.parse(localStorage.getItem("userChamp")).str
-    ? {
-      str: 12,
-      dex: 3,
-      vit: 17,
-      agil: 5,
-      name: "Sodiicc",
-      class: "ogr",
-      hp: 120,
-      lvl: 1,
-      exp: 0,
-      items: [],
-      stats: 3
-    }
-    : JSON.parse(localStorage.getItem("userChamp"))
-    );
+      ? {
+          str: 12,
+          dex: 3,
+          vit: 17,
+          agil: 5,
+          name: "Sodiicc",
+          class: "ogr",
+          hp: 120,
+          lvl: 1,
+          exp: 0,
+          items: [],
+          stats: 3
+        }
+      : JSON.parse(localStorage.getItem("userChamp"))
+  );
   const [enemyStats, setEnemy] = useState({
     str: 13,
     dex: 15,
@@ -59,7 +60,7 @@ const GameField = props => {
   );
   const [lowEnemyHp, setLowEnemyHp] = useState(30);
   const [enemyChamp, setEnemyChamp] = useState(false);
-  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0, 0]);
+  const [enemyDiff, setEnemyDiff] = useState([0, 0, 0, 0, 0]);
   const [toUserDmg, setToUserDmg] = useState(0);
   const [toEnemyDmg, setToEnemyDmg] = useState(0);
   const [showUserDmg, setShowUserDmg] = useState("");
@@ -90,8 +91,8 @@ const GameField = props => {
     }
   }, [user.userChamp]);
   useEffect(() => {
-    if(userStats.items.length)setCalcStats(userStats.items)
-  }, [userStats.items])
+    if (userStats.items.length) setCalcStats(userStats.items);
+  }, [userStats.items]);
 
   const setCalcStats = items => {
     let userCopy = JSON.parse(JSON.stringify(userStats));
@@ -251,7 +252,8 @@ const GameField = props => {
   };
 
   const increaseDrop = () => {
-    return enemyStats.lvl - userStats.lvl + 1;
+    if(enemyStats.lvl > userStats.lvl) return enemyStats.lvl - userStats.lvl + 1;
+    return 1
   };
 
   useEffect(() => {
@@ -260,13 +262,20 @@ const GameField = props => {
       if (lowEnemyHp <= 0 && lowHp > 0) {
         setRes("YOU WIN");
         setExp(Math.round(enemyStats.lvl * 10 * (1 + 2 * (1 - lowHp / hp))));
-        if (rand < 0.001 * increaseDrop() * dropChance) setDrop(findItem("epic"));
-        else if (rand < 0.003 * increaseDrop() * dropChance) setDrop(findItem("legendary"));
-        else if (rand < 0.008 * increaseDrop() * dropChance) setDrop(findItem("rare"));
-        else if (rand < 0.015 * increaseDrop() * dropChance) setDrop(findItem("magic"));
-        else if (rand < 0.035 * increaseDrop() * dropChance) setDrop(findItem("uncommon"));
-        else if (rand < 0.09 * increaseDrop() * dropChance) setDrop(findItem("normal"));
-        else if (rand < 0.2 * increaseDrop() * dropChance) setDrop(findItem("common"));
+        if (rand < 0.001 * increaseDrop() * dropChance)
+          setDrop(findItem("epic"));
+        else if (rand < 0.003 * increaseDrop() * dropChance)
+          setDrop(findItem("legendary"));
+        else if (rand < 0.008 * increaseDrop() * dropChance)
+          setDrop(findItem("rare"));
+        else if (rand < 0.015 * increaseDrop() * dropChance)
+          setDrop(findItem("magic"));
+        else if (rand < 0.035 * increaseDrop() * dropChance)
+          setDrop(findItem("uncommon"));
+        else if (rand < 0.09 * increaseDrop() * dropChance)
+          setDrop(findItem("normal"));
+        else if (rand < 0.2 * increaseDrop() * dropChance)
+          setDrop(findItem("common"));
       } else if (lowEnemyHp > 0 && lowHp <= 0) {
         setRes("YOU LOSE");
         setExp(Math.round(enemyStats.lvl * 2));
@@ -296,16 +305,23 @@ const GameField = props => {
     }
   };
 
-  const onChangeDiff = data => {
-    let diff = [0, 0, 0, 0];
+  const onChangeDiff = (data, lvl) => {
+    console.log('data, lvl', data, lvl)
+    let diff = [0, 0, 0, 0, 0];
     diff[data] = 1;
     setEnemyDiff(diff);
     let rand = Math.random();
-    let lvlData
-    if(data === 3){
-      lvlData = allEnemy.filter(el => el.lvl === 5)
-    }else{
-      lvlData = allEnemy.filter( el => el.lvl === userStats.lvl + diff.indexOf(1))
+    let lvlData;
+    if (data === 3) {
+      lvlData = allEnemy.filter(el => el.lvl === 5);
+    }else if(data ===4) {
+      lvlData = allEnemy.filter(
+        el => el.lvl === lvl
+      )
+    } else {
+      lvlData = allEnemy.filter(
+        el => el.lvl === userStats.lvl + diff.indexOf(1)
+      );
     }
     let enemy = lvlData[Math.floor(rand * lvlData.length)];
     setEnemy(enemy);
@@ -320,8 +336,10 @@ const GameField = props => {
     setEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setLowEnemyHp(Math.round(enemyStats.hp * (1 + enemyStats.vit / 30)));
     setEnemyChamp(true);
-    setEnemyDiff([0, 0, 0, 0]);
+    setEnemyDiff([0, 0, 0, 0, 0]);
     setResult(null);
+    if(enemyStats.name === 'Boss')setDropChance(30)
+    else setDropChance(1.5)
   };
 
   const onSetType = set => {
@@ -340,10 +358,10 @@ const GameField = props => {
       copyUser.stats += 3;
       copyUser.exp -= maxExp;
     }
-    if(copyUser.items.length) {
-      setCalcStats(copyUser.items)
-    }else {
-      setCalculatedStats(copyUser)
+    if (copyUser.items.length) {
+      setCalcStats(copyUser.items);
+    } else {
+      setCalculatedStats(copyUser);
     }
     setUser(copyUser);
     setDrop(null);
@@ -368,10 +386,10 @@ const GameField = props => {
       copyStats[stat] += 1;
       copyStats.stats -= 1;
       setUser(copyStats);
-      if(userStats.items.length) {
-        setCalcStats(copyStats.items)
-      }else {
-        setCalculatedStats(copyStats)
+      if (userStats.items.length) {
+        setCalcStats(copyStats.items);
+      } else {
+        setCalculatedStats(copyStats);
       }
     }
   };
@@ -393,7 +411,12 @@ const GameField = props => {
         />
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
-            <div>
+            <div
+              data-for="fightType"
+              data-type="info"
+              data-tip="critical chance increased by 30%"
+              data-iscapture="true"
+            >
               <input
                 type="radio"
                 id="kick1"
@@ -404,7 +427,12 @@ const GameField = props => {
               />
               <label htmlFor="kick1">head</label>
             </div>
-            <div>
+            <div
+              data-for="fightType"
+              data-type="info"
+              data-tip="critical strike increased by 40%"
+              data-iscapture="true"
+            >
               <input
                 type="radio"
                 id="kick2"
@@ -415,7 +443,12 @@ const GameField = props => {
               />
               <label htmlFor="kick2">body</label>
             </div>
-            <div>
+            <div
+              data-for="fightType"
+              data-type="info"
+              data-tip="block increased by 30%"
+              data-iscapture="true"
+            >
               <input
                 type="radio"
                 id="kick3"
@@ -426,6 +459,7 @@ const GameField = props => {
               />
               <label htmlFor="kick3">legs</label>
             </div>
+            <ReactTooltip id="fightType"/>
             <button onClick={() => fightBtn()}>fight</button>
           </div>
         ) : null}
