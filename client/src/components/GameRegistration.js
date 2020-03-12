@@ -90,8 +90,12 @@ const GameRegistration = props => {
           }
         </div>
       ) : (
+        <div style={{textAlign: 'center'}}>
         <div style={{ fontWeight: 700, fontSize: "30px" }}>
-          LOG IN or CREATE ACCOUNT !
+          LOG IN or CREATE an ACCOUNT !
+        </div>
+        <img style={{width: '100%'}} src='https://images.alphacoders.com/103/1032803.jpg' />
+
         </div>
       )}
     </StyledGame>

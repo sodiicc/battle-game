@@ -7,14 +7,16 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
   const [lvl, setLvl] = useState(1)
 
   const setDiff = (e) => {
-    setLvl(+e)
-    changeDiff(4, +e)
+    if(e<6 && e>0){
+      setLvl(+e)
+      changeDiff(4, +e)
+    }
   }
 
   return (
     <StyledDiv>
       <div>
-        <div>Сhoose the difficulty of your opponent</div>
+        <div style={{marginBottom: '1rem'}}>Сhoose the difficulty of your opponent</div>
         <div>custom level
               <input
               className='ml-3'
@@ -26,7 +28,10 @@ const ChoseEnemy = ({ diff, changeDiff, confirm }) => {
                 onChange={(e) => changeDiff(4, lvl)}
               />
               <label htmlFor="dificulti5"></label>
-              <input className='ml-1' min='1' max='5' placeholder='choose enemy level' type='number' value={lvl} onChange={(e) => setDiff(+e.target.value)} />
+             <button className='ml-2 lvl-butt'  onClick={(e) => setDiff(lvl-1)}>-</button> 
+             <span className='lvl'>{lvl}</span>
+             <button className='lvl-butt'  onClick={(e) => setDiff(lvl+1)}>+</button> 
+              {/* <input className='ml-1' min='1' max='5' placeholder='choose enemy level' type='number' value={lvl} onChange={(e) => setDiff(+e.target.value)} /> */}
             </div>
         <div className="diff-wrapper">
           <div className="diff">
@@ -111,5 +116,13 @@ const StyledDiv = styled.div`
   }
   .diff {
     padding: 20px;
+  }
+  .lvl {
+    padding: 0 5px;
+    margin: 0 10px;
+    background-color: var(--common);
+  }
+  .lvl-butt {
+    font-size: 0.8rem;
   }
 `;
