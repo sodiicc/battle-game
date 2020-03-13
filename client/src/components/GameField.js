@@ -9,6 +9,7 @@ import {
   calculateBlock,
   calculateAttack
 } from "./_additionalCimponents/calculateDmg";
+import { calcRandomStats } from "./_additionalCimponents/randomStats";
 import { img_weapons } from "../assets";
 import ReactTooltip from "react-tooltip";
 // import { items } from "./_additionalCimponents/items";
@@ -241,7 +242,6 @@ const GameField = props => {
   ]);
 
   const findItem = rar => {
-    console.log("rar", rar);
     return allItems.filter(el => el.lvl === enemyStats.lvl && el.rar === rar)[
       Math.floor(
         Math.random() *
@@ -313,7 +313,7 @@ const GameField = props => {
     let rand = Math.random();
     let lvlData;
     if (data === 3) {
-      lvlData = allEnemy.filter(el => el.lvl === 5);
+      lvlData = allEnemy.filter(el => el.lvl === userStats.lvl + 3 && el.class === 'boss');
     }else if(data ===4) {
       lvlData = allEnemy.filter(
         el => el.lvl === lvl
@@ -324,6 +324,7 @@ const GameField = props => {
       );
     }
     let enemy = lvlData[Math.floor(rand * lvlData.length)];
+    enemy = calcRandomStats(enemy)
     setEnemy(enemy);
     let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));
     setEnemyHp(hp);
