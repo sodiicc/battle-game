@@ -74,6 +74,10 @@ const GameField = props => {
   const [usrDMG, setUsrDMG] = useState([0, 0, 0, 0]);
   const [enemyDMG, setEnemyDMG] = useState([0, 0, 0, 0]);
   const [dropChance, setDropChance] = useState(1.5);
+  const [userAttack, setUserAttack] = useState(0);
+  const [isCrit, setIsCrit] = useState(0);
+  const [crit, setCrit] = useState("");
+  const [isBlock, setIsBlock] = useState(0);
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
@@ -88,15 +92,16 @@ const GameField = props => {
   useEffect(() => {
     if (user.userChamp) {
       setUser(user.userChamp);
-      if (user.userChamp) setCalcStats(user.userChamp.items);
+      if (user.userChamp) setCalcStats(user.userChamp);
     }
   }, [user.userChamp]);
   useEffect(() => {
-    if (userStats.items.length) setCalcStats(userStats.items);
+    if (userStats.items.length) setCalcStats(userStats);
   }, [userStats.items]);
 
-  const setCalcStats = items => {
-    let userCopy = JSON.parse(JSON.stringify(userStats));
+  const setCalcStats = stats => {
+    let items = stats.items;
+    let userCopy = JSON.parse(JSON.stringify(stats));
     if (items.length) {
       let item = items.find(el => el.equipped === true) || items[0];
       userCopy.hp += item.hp;
@@ -113,16 +118,17 @@ const GameField = props => {
     axios.get("/items").then(res => setAllItems(res.data));
   }, []);
 
-  useEffect(() => {
-    setUsrDMG([
-      calculateCrit(
-        fightType.indexOf(true),
-        calculatedStats.dex,
-        calculatedStats.agil,
-        enemyStats.dex,
-        enemyStats.agil,
-        userStats.class
-      )[2] * 100,
+  const calcUsrDmg = () => {
+    let calcCrit = calculateCrit(
+      fightType.indexOf(true),
+      calculatedStats.dex,
+      calculatedStats.agil,
+      enemyStats.dex,
+      enemyStats.agil,
+      userStats.class
+    );
+    return [
+      calcCrit[2] * 100,
       calculateBlock(
         fightType.indexOf(true),
         calculatedStats.dex,
@@ -144,7 +150,40 @@ const GameField = props => {
         enemyStats.agil,
         userStats.class
       )[3] * 100
-    ]);
+    ];
+  };
+
+  const calcUsrDmgWithCrit = () => {
+    let usrCrit = calculateCrit(
+      fightType.indexOf(true),
+      calculatedStats.dex,
+      calculatedStats.agil,
+      enemyStats.dex,
+      enemyStats.agil,
+      userStats.class
+    );
+
+    let usrBlock = calculateBlock(
+      fightType.indexOf(true),
+      enemyStats.dex,
+      calculatedStats.str,
+      userStats.class
+    );
+
+    let attack = calculateAttack(
+      calculatedStats.lvl,
+      calculatedStats.str,
+      enemyStats.str,
+      enemyStats.vit,
+      userStats.class
+    );
+
+    setUserAttack(attack);
+    return Math.round(usrCrit[0] * attack) * usrBlock[0];
+  };
+
+  useEffect(() => {
+    setUsrDMG(calcUsrDmg());
     setEnemyDMG([
       calculateCrit(
         Math.floor(Math.random() * 3),
@@ -177,31 +216,7 @@ const GameField = props => {
       )[3] * 100
     ]);
 
-    setToEnemyDmg(
-      Math.round(
-        calculateCrit(
-          fightType.indexOf(true),
-          calculatedStats.dex,
-          calculatedStats.agil,
-          enemyStats.dex,
-          enemyStats.agil,
-          userStats.class
-        )[0] *
-          calculateAttack(
-            calculatedStats.lvl,
-            calculatedStats.str,
-            enemyStats.str,
-            enemyStats.vit,
-            userStats.class
-          )
-      ) *
-        calculateBlock(
-          fightType.indexOf(true),
-          enemyStats.dex,
-          calculatedStats.str,
-          userStats.class
-        )[0]
-    );
+    setToEnemyDmg(calcUsrDmgWithCrit());
     setToUserDmg(
       Math.round(
         calculateCrit(
@@ -252,8 +267,9 @@ const GameField = props => {
   };
 
   const increaseDrop = () => {
-    if(enemyStats.lvl > userStats.lvl) return enemyStats.lvl - userStats.lvl + 1;
-    return 1
+    if (enemyStats.lvl > userStats.lvl)
+      return enemyStats.lvl - userStats.lvl + 1;
+    return 1;
   };
 
   useEffect(() => {
@@ -296,6 +312,11 @@ const GameField = props => {
     setLowEnemyHp(hp => hp - toEnemyDmg);
     setShowEnemyDmg(toEnemyDmg);
     setShowUserDmg(toUserDmg);
+    setCrit(`crit: ${toEnemyDmg}`);
+    if (toEnemyDmg > userAttack * 1.5) setIsCrit(1);
+    else setIsCrit(0);
+    if (toUserDmg == 0) setIsBlock(1)
+    else setIsBlock(0)
   };
 
   const fightBtn = () => {
@@ -306,29 +327,30 @@ const GameField = props => {
   };
 
   const onChangeDiff = (data, lvl) => {
-    console.log('data, lvl', data, lvl)
+    console.log("data, lvl", data, lvl);
     let diff = [0, 0, 0, 0, 0];
     diff[data] = 1;
     setEnemyDiff(diff);
     let rand = Math.random();
     let lvlData;
     if (data === 3) {
-      lvlData = allEnemy.filter(el => el.lvl === userStats.lvl + 3 && el.class === 'boss');
-    }else if(data ===4) {
       lvlData = allEnemy.filter(
-        el => el.lvl === lvl
-      )
+        el => el.lvl === userStats.lvl + 3 && el.class === "boss"
+      );
+    } else if (data === 4) {
+      lvlData = allEnemy.filter(el => el.lvl === lvl);
     } else {
       lvlData = allEnemy.filter(
         el => el.lvl === userStats.lvl + diff.indexOf(1)
       );
     }
     let enemy = lvlData[Math.floor(rand * lvlData.length)];
-    enemy = calcRandomStats(enemy)
+    enemy = calcRandomStats(enemy);
     setEnemy(enemy);
     let hp = Math.round(enemy.hp * (1 + enemy.vit / 30));
     setEnemyHp(hp);
     setLowEnemyHp(hp);
+    setCrit("");
   };
 
   const confirmDiff = () => {
@@ -339,12 +361,13 @@ const GameField = props => {
     setEnemyChamp(true);
     setEnemyDiff([0, 0, 0, 0, 0]);
     setResult(null);
-    if(enemyStats.name === 'Boss')setDropChance(30)
-    else setDropChance(1.5)
+    if (enemyStats.name === "Boss") setDropChance(30);
+    else setDropChance(1.5);
   };
 
   const onSetType = set => {
     setFight(set);
+    setCrit("");
   };
 
   const dropConfirm = () => {
@@ -360,7 +383,7 @@ const GameField = props => {
       copyUser.exp -= maxExp;
     }
     if (copyUser.items.length) {
-      setCalcStats(copyUser.items);
+      setCalcStats(copyUser);
     } else {
       setCalculatedStats(copyUser);
     }
@@ -377,7 +400,7 @@ const GameField = props => {
       element.equipped = false;
     });
     copyStats.items[ind].equipped = true;
-    setCalcStats(copyStats.items);
+    setCalcStats(copyStats);
     setUser(copyStats);
   };
 
@@ -388,12 +411,15 @@ const GameField = props => {
       copyStats.stats -= 1;
       setUser(copyStats);
       if (userStats.items.length) {
-        setCalcStats(copyStats.items);
+        setCalcStats(copyStats);
       } else {
         setCalculatedStats(copyStats);
       }
     }
   };
+
+  console.log("isCrit", isCrit);
+  console.log("crit", crit);
 
   return (
     <StyledField>
@@ -410,6 +436,8 @@ const GameField = props => {
           levelUp={levelUp}
           chances={usrDMG}
         />
+        {isCrit ? <div className="crit-dmg">{crit}</div> : null}
+        {isBlock ?<div className="block">block</div>: null}
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
             <div
@@ -460,7 +488,7 @@ const GameField = props => {
               />
               <label htmlFor="kick3">legs</label>
             </div>
-            <ReactTooltip id="fightType"/>
+            <ReactTooltip id="fightType" />
             <button onClick={() => fightBtn()}>fight</button>
           </div>
         ) : null}
@@ -633,5 +661,40 @@ const StyledField = styled.div`
     border: 1px solid var(--legendary);
     width: 20px;
     text-align: center;
+  }
+  .crit-dmg {
+    position: fixed;
+    top: 12%;
+    left: 45%;
+    color: var(--epic);
+    font-size: 2rem;
+    animation: hide 3s forwards;
+  }
+  .block {
+    position: fixed;
+    top: 18%;
+    left: 45%;
+    color: var(--uncommon);
+    font-size: 2rem;
+    animation: hide 3s forwards;
+  }
+
+  @keyframes hide {
+    0% {
+      font-size: 0.1rem;
+      opacity: 1;
+    }
+    10% {
+      font-size: 3rem;
+      opacity: 1;
+    }
+    70% {
+      font-size: 2rem;
+      opacity: 0.5;
+    }
+    100% {
+      font-size: 0.1rem;
+      opacity: 0;
+    }
   }
 `;
