@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components'
 import {useDispatch} from 'react-redux'
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const Logout = props => {
-  let history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const onSubmit = () => {
     dispatch({type: 'LOGOUT_USER'})
-    history.push("/")
+    navigate("/")
     }    
 
   return (

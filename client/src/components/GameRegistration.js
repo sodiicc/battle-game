@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
+import styled from 'styled-components'
 import { img_heroes } from "../assets";
-import ReactTooltip from "react-tooltip";
+import {Tooltip as ReactTooltip} from "react-tooltip";
+import { api } from "../api";
+import { useNavigate } from "react-router-dom"
 
 const GameRegistration = props => {
+  const navigate = useNavigate()
   let dispatch = useDispatch();
   let user = useSelector(state => state.user);
 
   const [heroes, setHeroes] = useState([]);
   useEffect(() => {
-    axios
+    api
       .get("/heroes")
       .then(res => setHeroes(res.data))
       .catch(err => console.log(err));
@@ -19,21 +21,21 @@ const GameRegistration = props => {
 
   useEffect(() => {
     if (user.class.length > 2) {
-      props.history.push("/game");
+      navigate("/game");
     } else {
-      props.history.push("/");
+      navigate("/");
     }
-  }, [user.name, props.history, user.class]);
+  }, [navigate, user.class]);
 
   const onChoose = e => {
     let hero = heroes.find(el => el.class === e.target.name);
     hero.name = user.name;
-    axios
+    api
       .post("/users/update", hero)
       .then(res =>
         dispatch({ type: "SET_USER", payload: JSON.parse(res.config.data) })
       )
-      .then(() => props.history.push("/game"));
+      .then(() => navigate("/game"));
   };
   const passive = [
     "Warrior's block is increased to 30%",
@@ -50,7 +52,7 @@ const GameRegistration = props => {
 
   return (
     <StyledGame>
-      {user.name.length ? (
+      {user?.name?.length ? (
         <div>
           <div>Choose your class</div>
           {
@@ -65,9 +67,9 @@ const GameRegistration = props => {
                       onClick={e => onChoose(e)}
                       src={img_heroes[item.class]}
                       alt="img"
-                      data-for={"register" + index}
+                      data-tooltip-id={"register" + index}
                       data-type="info"
-                      data-tip={passive[index]}
+                      data-tooltip-content={passive[index]}
                     ></img>
                     <p>Hp: {item.hp}</p>
                     <p>Str: {item.str}</p>
@@ -94,7 +96,7 @@ const GameRegistration = props => {
         <div style={{ fontWeight: 700, fontSize: "30px" }}>
           LOG IN or CREATE an ACCOUNT !
         </div>
-        <img style={{width: '100%'}} src='https://images.alphacoders.com/103/1032803.jpg' />
+        <img style={{width: '100%'}} src='https://images.alphacoders.com/103/1032803.jpg' alt='img' />
 
         </div>
       )}
@@ -117,4 +119,4 @@ const StyledGame = styled.div`
   .card-class {
     padding: 10px 20px;
   }
-`;
+`

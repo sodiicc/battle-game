@@ -17,4 +17,5 @@ const heroSchema = new Schema({
 })
 
 const Hero = mongoose.model('Hero', heroSchema);
+console.log('Hero')
 module.exports = Hero;

@@ -1,18 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { img_all } from "../assets";
 import { img_weapons } from "../assets";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const ChampCard = props => {
-  const [hoverData, setData] = useState(null);
-
-  const onHover = el => {
-    setData(el);
-  };
-  const onBlur = el => {
-    setData(null);
-  };
-  // console.log('setData', props.chances)
 
   return (
     <div>
@@ -22,13 +13,12 @@ const ChampCard = props => {
             <div
               className="hero-exp"
               style={{
-                height: `${
-                  props.exp < props.maxExp
-                    ? props.exp <= 0
-                      ? 5
-                      : (props.exp / props.maxExp) * 300
-                    : 300
-                }px`
+                height: `${props.exp < props.maxExp
+                  ? props.exp <= 0
+                    ? 5
+                    : (props.exp / props.maxExp) * 300
+                  : 300
+                  }px`
               }}
             ></div>
           ) : null}
@@ -47,13 +37,12 @@ const ChampCard = props => {
           <div
             className="hero-hp"
             style={{
-              height: `${
-                props.lowHp < props.hp
-                  ? props.lowHp < 0
-                    ? 5
-                    : (props.lowHp / props.hp) * 300
-                  : 300
-              }px`
+              height: `${props.lowHp < props.hp
+                ? props.lowHp < 0
+                  ? 5
+                  : (props.lowHp / props.hp) * 300
+                : 300
+                }px`
             }}
           ></div>
         </div>
@@ -91,7 +80,7 @@ const ChampCard = props => {
               <span onClick={() => props.levelUp("agil")} className="add-stats">
                 +
               </span>
-            ) : null}                
+            ) : null}
           </div>
           <p>
             Exp: {props.exp}/{props.maxExp}
@@ -105,47 +94,43 @@ const ChampCard = props => {
             {props.stats.items.map((el, index) => {
               return (
                 <div key={`${el.name + index}`} data-for={el.name + index}
-                data-type="info"
-                data-tip={`${el.name}<br />Level: ${el.lvl}<br />Rarity: ${el.rar}<br />Hp: ${el.hp}<br />Str: ${el.str}<br />Dex: ${el.dex}<br />Vit: ${el.vit}<br />Agil: ${el.agil}`} className="img-wrapper">
+                  data-type="info"
+                  data-tip={`${el.name}<br />Level: ${el.lvl}<br />Rarity: ${el.rar}<br />Hp: ${el.hp}<br />Str: ${el.str}<br />Dex: ${el.dex}<br />Vit: ${el.vit}<br />Agil: ${el.agil}`} className="img-wrapper">
                   <img
                     onClick={() => props.onEquip(index)}
-                    onMouseEnter={() => onHover(el)}
-                    onMouseLeave={() => onBlur(el)}
                     className={el.equipped ? `equipped ${el.rare}` : el.rare}
                     src={img_weapons[el.img]}
                     alt="img"
+                    data-tooltip-id={el.name + index}
 
                   ></img>
                   <ReactTooltip
-                  backgroundColor='#def'
-                   className={el.rar} multiline={true} id={el.name + index} />
+                    backgroundColor='#def'
+                    className={el.rar} multiline={true} id={el.name + index}>
+                    <div className={el.rar}>
+                      <p>{el.name}</p>
+                      <p>Rarity: {el.rar}</p>
+                      <p>Str: {el.str}</p>
+                      <p>Dex: {el.dex}</p>
+                      <p>Vit: {el.vit}</p>
+                      <p>Agil: {el.agil}</p>
+                      <p>Lvl: {el.lvl}</p>
+                    </div>
+                  </ReactTooltip>
                 </div>
               );
             })}
-            {/* <div>
-              {hoverData ? (
-                <div className={hoverData.rar}>
-                  <p>{hoverData.name}</p>
-                  <p>Rarity: {hoverData.rar}</p>
-                  <p>Str: {hoverData.str}</p>
-                  <p>Dex: {hoverData.dex}</p>
-                  <p>Vit: {hoverData.vit}</p>
-                  <p>Agil: {hoverData.agil}</p>
-                  <p>Lvl: {hoverData.lvl}</p>
-                </div>
-              ) : null}
-            </div> */}
           </div>
         </div>
       ) : null}
       {props.chances ? (
-                  <div>
-                    <p>crit chance: {props.chances[0].toFixed(2)} %</p>
-                    {/* <p>crit power: {props.chances[3].toFixed(2)} %</p> */}
-                    <p>block: {props.chances[1].toFixed(2)} %</p>
-                    <p>attack: {props.chances[2].toFixed(2)} HP</p>
-                  </div>
-                ) : null}
+        <div>
+          <p>crit chance: {props.chances[0].toFixed(2)} %</p>
+          {/* <p>crit power: {props.chances[3].toFixed(2)} %</p> */}
+          <p>block: {props.chances[1].toFixed(2)} %</p>
+          <p>attack: {props.chances[2].toFixed(2)} HP</p>
+        </div>
+      ) : null}
     </div>
   );
 };

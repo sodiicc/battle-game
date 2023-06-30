@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components'
-import axios from 'axios'
 import {useDispatch} from 'react-redux'
+import { api } from '../api';
 
 const LoginModal = props => {
 
@@ -19,7 +19,7 @@ const LoginModal = props => {
 
   const onSubmit = () => {
     if(name.length > 2 && password.length) {
-      axios.post("/users/login", {name, password})
+      api.post("/users/login", {name, password})
         .then(res => {
           if(typeof res.data === 'string') {
             setErrors(res.data)

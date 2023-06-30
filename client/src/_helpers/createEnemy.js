@@ -1,7 +1,7 @@
-import axios from 'axios'
+import { api } from '../api';
 
 const createEnemy = () => {
-  axios.post("/enemies/add", {
+  api.post("/enemies/add", {
     name: "bot-sorcery",
     class: "sorcery",
     lvl: 2,

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import ChampCard from "./ChampCard";
-import axios from "axios";
 import ChoseEnemy from "./ChoseEnemy";
 import {
   calculateCrit,
@@ -11,7 +10,8 @@ import {
 } from "./_additionalCimponents/calculateDmg";
 import { calcRandomStats } from "./_additionalCimponents/randomStats";
 import { img_weapons } from "../assets";
-import ReactTooltip from "react-tooltip";
+import {Tooltip as ReactTooltip} from "react-tooltip";
+import { api } from "../api";
 // import { items } from "./_additionalCimponents/items";
 
 const GameField = props => {
@@ -81,7 +81,7 @@ const GameField = props => {
 
   useEffect(() => {
     dispatch({ type: "SET_USER_CHAMP", payload: userStats });
-    axios.post("/users/update", userStats);
+    api.post("/users/update", userStats);
     setMaxExp(userStats.lvl * 250);
   }, [userStats]);
 
@@ -114,8 +114,8 @@ const GameField = props => {
   };
 
   useEffect(() => {
-    axios.get("/enemies").then(res => setAllEnemy(res.data));
-    axios.get("/items").then(res => setAllItems(res.data));
+    api.get("/enemies").then(res => setAllEnemy(res.data));
+    api.get("/items").then(res => setAllItems(res.data));
   }, []);
 
   const calcUsrDmg = () => {
@@ -441,9 +441,9 @@ const GameField = props => {
         {enemyChamp && !result ? (
           <div className="radio-wrapper">
             <div
-              data-for="fightType"
+              data-tooltip-id="fightType"
               data-type="info"
-              data-tip="critical chance increased by 30%"
+              data-tooltip-content="critical chance increased by 30%"
               data-iscapture="true"
             >
               <input
@@ -457,9 +457,9 @@ const GameField = props => {
               <label htmlFor="kick1">head</label>
             </div>
             <div
-              data-for="fightType"
+              data-tooltip-id="fightType"
               data-type="info"
-              data-tip="critical strike increased by 40%"
+              data-tooltip-content="critical strike increased by 40%"
               data-iscapture="true"
             >
               <input
@@ -473,9 +473,9 @@ const GameField = props => {
               <label htmlFor="kick2">body</label>
             </div>
             <div
-              data-for="fightType"
+              data-tooltip-id="fightType"
               data-type="info"
-              data-tip="block increased by 30%"
+              data-tooltip-content="block increased by 30%"
               data-iscapture="true"
             >
               <input

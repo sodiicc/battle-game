@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios'
 import {useDispatch} from 'react-redux'
+import { api } from '../api';
 
 const RegisterModal = () => {
 
@@ -21,7 +21,7 @@ const RegisterModal = () => {
 
   const onSubmit = () => {
     if(name.length > 2 && name.length < 15 && password.length > 5 && password === Confirmpassword) {
-      axios.post("/users/createuser", {name, password})
+      api.post("/users/createuser", {name, password})
         .then(res => {
 
           if(typeof res.data === 'string') {
